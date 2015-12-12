@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Random;
 
 
+
 import me.engine.location.Location;
 import me.engine.main.Controls;
 import me.engine.main.GameTickHandler;
@@ -17,6 +18,7 @@ import me.engine.main.Inventory;
 import me.engine.main.MainClass;
 import me.engine.block.HandledBlock;
 import me.engine.entity.EntityBuilding;
+import me.engine.entity.EntityCrow;
 import me.engine.entity.Player;
 import me.engine.gui.Button;
 import me.engine.gui.GuiScreen;
@@ -65,12 +67,12 @@ public class StartClass extends MainClass {
 						sheetloader, a, 0);
 			}
 			
-			/*
-			sheetloader = new SheetLoader(mainFolder+"ghost.png", 1, 4, 32, 32);
+			
+			sheetloader = new SheetLoader(mainFolder+"shoe.png", 1, 4, 32, 32);
 			for (int a = 0; a < 4; a++) {
-				getPictureLoader().ImportFromSheet("ghost_walk_" + String.valueOf(a),
+				getPictureLoader().ImportFromSheet("shoe_walk_" + String.valueOf(a),
 						sheetloader, a, 0);
-			}*/
+			}
 			
 			
 			sheetloader = new SheetLoader(mainFolder+"wall.png", 1, 4, 32, 64);
@@ -105,8 +107,8 @@ public class StartClass extends MainClass {
 			
 //			AnimationHandler.addHandler("enemy", 1);
 //			AnimationHandler.getHandler("enemy").addAnimation(38, "walk", 100, 1, true);
-			AnimationHandler.addHandler("ghost", 1);
-			AnimationHandler.getHandler("ghost").addAnimation("ghost", "walk", 100, 1, true);
+			AnimationHandler.addHandler("shoe", 1);
+			AnimationHandler.getHandler("shoe").addAnimation("shoe", "walk", 100, 1, true);
 			
 			AnimationHandler.addHandler("player", 2);
 			AnimationHandler.getHandler("player").addAnimation("player", "walk", 100, 1, true);
@@ -154,6 +156,8 @@ public class StartClass extends MainClass {
 	public void postInit(){
 
 	}
+	private int mapVariable=0;
+	
 	
 	public void load(int mapID) {
 		this.loadMap();
@@ -194,7 +198,7 @@ public class StartClass extends MainClass {
 					int sz = 0;
 					for (int[] ints : blockarray) {
 						int sx = 0;
-						if(blockarray.size() - sz - 1 < 8)
+						if(blockarray.size() - sz - 1 <= 8)
 							for (int in : ints) {
 								world.setBlockID(sx, blockarray.size() - sz - 1, in);
 								sx++;
@@ -205,6 +209,10 @@ public class StartClass extends MainClass {
 				
 
 				world.setPlayer(new Player(this, player.x,  player.z));
+				Render2D.sunMode=true;
+				Render2D.sunUp=true;
+				Render2D.sunSpins=-1;
+				this.resetTimeTicks();
 //				world.calcLight();
 				
 
@@ -212,7 +220,7 @@ public class StartClass extends MainClass {
 //				for(int i=1;i<10;i++)
 //					world.addEntity(new EntityBuilding(this,10f + ((world.getSizeX()-20f)/10)*i,7.25f + random.nextFloat()/2,0,0));
 //				world.addEntity(new EntityBuilding(this,world.getSizeX()-10f,7.25f + random.nextFloat()/2,1,0));
-
+				mapVariable=0;
 				this.initEntitysIL(world);
 				this.setWorld(world);
 				reRender(world);
@@ -286,10 +294,24 @@ public class StartClass extends MainClass {
 			this.setDialog("Game",
 					"Hello and welcome to A Foxs Garden. Use your Mouse to Control. Drop a coin next to the stone to grow a plant. Drop 4 coins to upgrade it. Goal: Reach 200 Score");
 		}
+		if(getLevel()==1){
+			this.setDialog("Game",
+					"When the sun rises enemys will appear! Protect your flower and build walls! Goal: Defeat one wave");
+		}
+		if(getLevel()==2){
+			this.setDialog("Game",
+					"Defent the plants! More enemies will approach! Goal: Reach 300 Score");
+		}
 	}
 	
 	public void initValuesIL(){
 		if(getLevel()==0){
+			this.getWorld().getPlayer().setEnergy(5);
+		}
+		if(getLevel()==1){
+			this.getWorld().getPlayer().setEnergy(5);
+		}
+		if(getLevel()==2){
 			this.getWorld().getPlayer().setEnergy(5);
 		}
 	}
@@ -297,6 +319,11 @@ public class StartClass extends MainClass {
 	public float getSunSpeedIL() {
 		if(getLevel()==0)
 			return 100f;
+		if(getLevel()==1)
+			return 500f;
+		if(getLevel()==2)
+			return 400f;
+		
 		return 1000f;
 	}
 	
@@ -308,6 +335,39 @@ public class StartClass extends MainClass {
 			else
 				return false;
 		}
+		if(getLevel()==1){
+			if(Render2D.sunSpins >= 2)
+				return true;
+			else
+				return false;
+		}
+		if(getLevel()==2){
+			if(getScore()>=300)
+				return true;
+			else
+				return false;
+		}
+		return false;
+	}
+	
+	private int countFlowers() {
+		int count=0;
+		for(int i=0;i<this.getWorld().getEntityArray().length;i++)	{
+			if(getWorld().getEntityArray()[i]==null  || !(getWorld().getEntityArray()[i] instanceof EntityBuilding))continue;
+			EntityBuilding bu = (EntityBuilding)getWorld().getEntityArray()[i];
+			if(bu.getBuild()!=0 && bu.getType()!=1)count++;
+		}
+		return count;
+	}
+	public boolean isGameOverIL() {
+		if(getLevel()==0)return false;
+		if(getLevel()==1){
+			return countFlowers()<=0;
+		}
+		if(getLevel()==2){
+			return countFlowers()<=0;
+		}
+		
 		return false;
 	}
 
@@ -316,6 +376,51 @@ public class StartClass extends MainClass {
 		random.setSeed(1L);
 		if(getLevel()==0){
 			world.addEntity(new EntityBuilding(this,10,7.25f + random.nextFloat()/2,0,0));
+		}
+		if(getLevel()==1){
+			world.addEntity(new EntityBuilding(this,10f,7.25f + random.nextFloat()/2,1,0));
+			EntityBuilding flower = new EntityBuilding(this,world.getSizeX()/2,7.25f + random.nextFloat()/2,0,2);
+			flower.setKind(3);
+			world.addEntity(flower);
+			world.addEntity(new EntityBuilding(this,world.getSizeX()-10f,7.25f + random.nextFloat()/2,1,0));
+		}
+		if(getLevel()==2){
+			world.addEntity(new EntityBuilding(this,10f,7.25f + random.nextFloat()/2,1,0));
+			EntityBuilding flower = new EntityBuilding(this,world.getSizeX()/2,7.25f + random.nextFloat()/2,0,2);
+			flower.setKind(1);
+			world.addEntity(flower);
+			flower = new EntityBuilding(this,world.getSizeX()/2 + 5f,7.25f + random.nextFloat()/2,0,0);
+			flower.setKind(0);
+			world.addEntity(flower);
+			flower = new EntityBuilding(this,world.getSizeX()/2 - 5f,7.25f + random.nextFloat()/2,0,0);
+			flower.setKind(0);
+			world.addEntity(flower);
+			world.addEntity(new EntityBuilding(this,world.getSizeX()-10f,7.25f + random.nextFloat()/2,1,0));
+		}
+	}
+	
+	public void tickEventIL(){
+		if(getLevel()==0){}
+		if(getLevel()==1){
+			if(Render2D.dayStatus()==-1 && mapVariable==0)
+				mapVariable=1;
+			if(Render2D.dayStatus()==1 && mapVariable==1){
+				getWorld().addEntity(new EntityCrow(this,true));
+				getWorld().addEntity(new EntityCrow(this,false));
+				mapVariable=2;
+			}
+		}
+		if(getLevel()==2){
+			if(Render2D.dayStatus()==0 && mapVariable<=0){
+				mapVariable=1;
+				if(Render2D.sunSpins>2)
+					 mapVariable=2;		
+			}
+			if(Render2D.dayStatus()==1 && mapVariable>0){
+				getWorld().addEntity(new EntityCrow(this,true));
+				getWorld().addEntity(new EntityCrow(this,false));
+				mapVariable--;
+			}
 		}
 	}
 	@Override

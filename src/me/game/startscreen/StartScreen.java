@@ -180,12 +180,19 @@ public class StartScreen {
 
 		try {
 		modes =	Display.getAvailableDisplayModes();
-			chosenMode = Display.getDesktopDisplayMode();
 			for (int i = 0; i < modes.length; i++) {
 				if(modes[i].getWidth()==320 && modes[i].getHeight()==200){
 					chosenMode = modes[i];
 				}
 			}
+			if(chosenMode==null)
+				for (int i = 0; i < modes.length; i++) {
+					if(modes[i].getWidth()==640 && modes[i].getHeight()==480){
+						chosenMode = modes[i];
+					}
+				}
+			if(chosenMode==null)
+				chosenMode = Display.getDesktopDisplayMode();
 		} catch (LWJGLException e) {
 			Sys.alert("Error", "Unable to determine display modes.");
 			System.exit(0);
@@ -195,6 +202,7 @@ public class StartScreen {
 			Sys.alert("Error", "Unable to find appropriate display mode.");
 			System.exit(0);
 		}
+
 
 		try {
 			Display.setDisplayMode(chosenMode);

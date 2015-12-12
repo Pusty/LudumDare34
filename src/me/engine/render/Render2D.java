@@ -317,10 +317,7 @@ public class Render2D {
 
 	private int displayDialog(String from, String text, int cur) {
 		{
-			String imageName = "tile_36";
-			if (from.equalsIgnoreCase("enemy")) {
-				imageName = "tile_38";
-			}
+			String imageName = "tile_5";
 
 			GL11.glPushMatrix();
 			GL11.glTranslatef(-16f, -10.5f, 0f);
@@ -352,7 +349,7 @@ public class Render2D {
 
 			GL11.glTranslatef(0f, -0.5f, 0f);
 			GL11.glScalef(0.5f, 0.5f, 0f);
-			renderString(mainclass, from);
+//			renderString(mainclass, from);
 			GL11.glScalef(2f, 2f, 0f);
 			GL11.glTranslatef(-0f, 0.5f, 0f);
 

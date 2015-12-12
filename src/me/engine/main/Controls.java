@@ -76,6 +76,10 @@ public class Controls {
 
 	boolean debug2Pressed = false;
 	
+	boolean misPressed = false;
+	
+	public static boolean MOUSE_CONTROL=true;
+	
 	public void controls() {
 		
 		if (!ispressedDebug && Keyboard.isKeyDown(Keyboard.KEY_F1)) {
@@ -174,7 +178,9 @@ public class Controls {
 					mainclass.getGui().tick();				
 			}
 			
-			if(Mouse.isButtonDown(0) && !mousePressed){
+			
+			
+			if((Mouse.isButtonDown(0) || (Keyboard.isKeyDown(Keyboard.KEY_D) || Keyboard.isKeyDown(Keyboard.KEY_RIGHT)) || (Keyboard.isKeyDown(Keyboard.KEY_A) || Keyboard.isKeyDown(Keyboard.KEY_LEFT))) && !mousePressed){
 				if(mainclass.getDialog()!=null &&mainclass.getDialogFrom()!=null){
 				mainclass.addDialogCur(1);
 				}else if(mainclass.getGui() != null){
@@ -182,11 +188,12 @@ public class Controls {
 				}else if(mainclass.getWorld().getPlayer().getHealth() <= 0){
 					restart(mainclass);
 				}
-//				mainclass.getSavedData().printOutAll();
 				mousePressed=true;
-			}else if(!Mouse.isButtonDown(0)){
+			}else if(!((Mouse.isButtonDown(0) || (Keyboard.isKeyDown(Keyboard.KEY_D) || Keyboard.isKeyDown(Keyboard.KEY_RIGHT)) || (Keyboard.isKeyDown(Keyboard.KEY_A) || Keyboard.isKeyDown(Keyboard.KEY_LEFT))))){
 				mousePressed=false;
 			}
+			
+			
 
 
 			if (mainclass.isTimeRunning() && mainclass.hasMapLoaded()) {
@@ -217,13 +224,11 @@ public class Controls {
 			*/
 
 				
+			if(Controls.MOUSE_CONTROL){
 				if (Mouse.isButtonDown(1)) {
 					mainclass.getWorld().getPlayer().down(mainclass);
 				}else if(!Mouse.isButtonDown(1))
-					mainclass.getWorld().getPlayer().down=false;
-				
-//				int mouseX = Mouse.getX();
-			
+					mainclass.getWorld().getPlayer().down=false;			
 				float relativeX = Mouse.getX()/(float)Display.getWidth();
 				if(relativeX < 0.45f){
 					mainclass.getWorld().getPlayer().left(mainclass);
@@ -235,6 +240,30 @@ public class Controls {
 					mainclass.getWorld().getPlayer().right=false;	
 					mainclass.getWorld().getPlayer().left=false;
 				}
+			}else{
+				if((Keyboard.isKeyDown(Keyboard.KEY_D) || Keyboard.isKeyDown(Keyboard.KEY_RIGHT)) && (Keyboard.isKeyDown(Keyboard.KEY_A) || Keyboard.isKeyDown(Keyboard.KEY_LEFT))){
+					mainclass.getWorld().getPlayer().down(mainclass);
+				}else {
+					mainclass.getWorld().getPlayer().down=false;
+				if (Keyboard.isKeyDown(Keyboard.KEY_D) || Keyboard.isKeyDown(Keyboard.KEY_RIGHT)) {
+					mainclass.getWorld().getPlayer().right(mainclass);
+				}else if(!(Keyboard.isKeyDown(Keyboard.KEY_D) && Keyboard.isKeyDown(Keyboard.KEY_RIGHT)))
+					mainclass.getWorld().getPlayer().right=false;			
+				if (Keyboard.isKeyDown(Keyboard.KEY_A) || Keyboard.isKeyDown(Keyboard.KEY_LEFT)) {
+					mainclass.getWorld().getPlayer().left(mainclass);
+				}else if(!(Keyboard.isKeyDown(Keyboard.KEY_A) && Keyboard.isKeyDown(Keyboard.KEY_LEFT)))
+					mainclass.getWorld().getPlayer().left=false;
+				}
+			}
+				
+			if(Keyboard.isKeyDown(Keyboard.KEY_M) && !misPressed){
+				Controls.MOUSE_CONTROL=!Controls.MOUSE_CONTROL;
+				misPressed=true;
+			}else if(!Keyboard.isKeyDown(Keyboard.KEY_M)){
+				misPressed=false;
+			}
+				
+				
 
 				if (Keyboard.isKeyDown(Keyboard.KEY_J)) {
 					if( !debugPressed){

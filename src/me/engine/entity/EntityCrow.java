@@ -8,14 +8,14 @@ import me.engine.main.MainClass;
 public class EntityCrow extends EntityMonster{
 
 	public EntityCrow(MainClass m,boolean side) {
-		super(m ,"crow",side);
+		super(m ,"shoe",side);
 	}
 	
 	
 	public  String getName(){return "Ghost";}
 	
 	public String getTextureName(int i){
-		return "ghost";
+		return "shoe";
 	}
 	
 	
@@ -36,7 +36,7 @@ public class EntityCrow extends EntityMonster{
 	public void cWE(MainClass mainclass, Entity e) {
 		if(e instanceof EntityBuilding){
 			EntityBuilding bu = (EntityBuilding)e;
-			if(bu.getBuild()!=2)return;
+			if(bu.getBuild()==0)return;
 			if(bu.getType()==1){
 				if(bu.getKind()-1 < 0)
 					bu.setBuild(0);
@@ -44,7 +44,8 @@ public class EntityCrow extends EntityMonster{
 					bu.setKind(bu.getKind()-1);
 				
 				mainclass.getWorld().removeEntity(this);
-			}
+			}else
+				bu.setBuild(0);
 				
 		}
 	}

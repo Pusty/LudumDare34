@@ -98,6 +98,7 @@ int tickupdate=40;
 				}
 			}  else if (mainclass.getWorld().getEntityArray()[i] instanceof EntityBuilding) {
 				((EntityBuilding)mainclass.getWorld().getEntityArray()[i]).buildingTick(mainclass);
+				EntityBuilding bu = ((EntityBuilding)mainclass.getWorld().getEntityArray()[i]);
 			} else if (mainclass.getWorld().getEntityArray()[i] instanceof EntityPortal) {
 				continue;
 				/*
@@ -142,15 +143,34 @@ int tickupdate=40;
 
 	}
 	long lastSynced;
+	int gameStatus=-1;
+	
 	public void gameTick() {
 		mainclass.getWorld().getPlayer().tick(mainclass);
 		movingTickEntity(mainclass, mainclass.getWorld().getPlayer());
 		mainclass.getWorld().getPlayer().addRender();
+		
+		if(gameStatus==1){
+			gameStatus=-1;
+			mainclass.setLevel(mainclass.getLevel()+1);
+			((StartClass)mainclass).load(mainclass.getLevel()+1);
+		}else if(gameStatus==2){
+			gameStatus=-1;
+			((StartClass)mainclass).load(mainclass.getLevel()+1);
+		}
+		
 		if(ticks == tickupdate-1){
 			mainclass.getSavedData().putData("level",mainclass.getLevel());
+			((StartClass)mainclass).tickEventIL();
 			if(((StartClass)mainclass).isGoalIL()){
-				mainclass.setLevel(mainclass.getLevel()+1);
-				((StartClass)mainclass).load(mainclass.getLevel()+1);
+				mainclass.setDialog("game", "Good job! Next Level!");
+				mainclass.setTimeRunning(false);
+				gameStatus=1;
+			}else if(((StartClass)mainclass).isGameOverIL()){
+				mainclass.setDialog("game", "Ohh :(");
+				mainclass.setTimeRunning(false);
+				gameStatus=2;
+
 			}
 		}
 //		if (mainclass.getWorld().getPlayer().getHealth() < 1)
@@ -192,7 +212,7 @@ int tickupdate=40;
 							((EntityMonster)living).cWE(mainclass,e);
 							if(!(e instanceof EntityBuilding))continue;
 							EntityBuilding bu = (EntityBuilding)e;
-								if(bu.getBuild()!=2 || bu.getType()!=1)continue;
+								if(bu.getType()!=1 || bu.getBuild()==0)continue;
 								done=false;break;
 						}
 					}

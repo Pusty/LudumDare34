@@ -25,7 +25,7 @@ public class EntityGhost extends EntityLiving {
 	public  String getName(){return "Ghost";}
 	
 	public String getTextureName(int i){
-		return "ghost";
+		return "shoe";
 	}
 	
 	

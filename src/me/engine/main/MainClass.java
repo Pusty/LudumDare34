@@ -55,6 +55,7 @@ public abstract class MainClass {
 	}
 	public long getTimeTicks() {return timeTicks;}
 	public void addTimeTick() {timeTicks=timeTicks+1;}
+	public void resetTimeTicks() {timeTicks=0;}
 	public String getPlayerName(){return playerName;}
 	public TextLoader getTextLoader(){return textloader;}
 	public GuiScreen getGui(){return gui;}
