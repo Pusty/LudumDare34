@@ -131,7 +131,7 @@ public class Player extends EntityLiving {
 	public boolean down = false;
 	public void down(MainClass mainclass) {
 		if(!down){
-			mainclass.getWorld().addEntity(new EntitySoul(mainclass,this.getX(),this.getZ()));
+			mainclass.getWorld().addEntity(new EntitySoul(mainclass,this.getX(),false));
 			down=true;
 		}
 	}

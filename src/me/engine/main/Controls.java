@@ -151,17 +151,6 @@ public class Controls {
 			if (!Keyboard.isKeyDown(Keyboard.KEY_C))
 				ispressedChange = false;
 
-			if(Mouse.isButtonDown(1) && mainclass.getDialog() == null && mainclass.getGui() == null){
-				Random random = new Random();
-				String endtext= null;
-				String name=null;
-				if(endtext == null){
-					endtext = mainclass.getWorld().getPlayer().getDialogText(random);
-					name = mainclass.getWorld().getPlayer().getTextureName(-1);
-				}
-				if(endtext != null)
-				mainclass.setDialog(name,endtext);
-			}
 			
 			
 			if(Keyboard.isKeyDown(Keyboard.KEY_E) && mainclass.getDialog() == null && mainclass.getGui() == null){
@@ -198,23 +187,7 @@ public class Controls {
 			}else if(!Mouse.isButtonDown(0)){
 				mousePressed=false;
 			}
-			
-		/*	if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
-				
-				if(mainclass.getDialog()!=null &&mainclass.getDialogFrom()!=null && !space_ispressed){
-					mainclass.addDialogCur(1);
-					space_ispressed=true;
-					}else if(mainclass.getGui() != null && !space_ispressed){
-						mainclass.getGui().click(mainclass, mx, mz);
-						space_ispressed=true;
-					}else if(mainclass.getWorld().getPlayer().getHealth() <= 0 && !space_ispressed){
-						restart(mainclass);
-						space_ispressed=true;
-					}else if(mainclass.isTimeRunning() && mainclass.hasMapLoaded() && !space_ispressed)
-						mainclass.getWorld().getPlayer().addStatus("SKILL1",999999,false);
-			}else if(!Keyboard.isKeyDown(Keyboard.KEY_SPACE)){
-				space_ispressed=false;
-			}*/
+
 
 			if (mainclass.isTimeRunning() && mainclass.hasMapLoaded()) {
 
@@ -225,6 +198,7 @@ public class Controls {
 				if (Keyboard.isKeyDown(Keyboard.KEY_3))
 					mainclass.setTimeSpeed(0.1f);
 
+				/*
 				if (Keyboard.isKeyDown(Keyboard.KEY_D) || Keyboard.isKeyDown(Keyboard.KEY_RIGHT)) {
 					mainclass.getWorld().getPlayer().right(mainclass);
 				}else if(!(Keyboard.isKeyDown(Keyboard.KEY_D) && Keyboard.isKeyDown(Keyboard.KEY_RIGHT)))
@@ -234,24 +208,34 @@ public class Controls {
 					mainclass.getWorld().getPlayer().left(mainclass);
 				}else if(!(Keyboard.isKeyDown(Keyboard.KEY_A) && Keyboard.isKeyDown(Keyboard.KEY_LEFT)))
 					mainclass.getWorld().getPlayer().left=false;
+				*/
 				
-				if (Keyboard.isKeyDown(Keyboard.KEY_S) || Keyboard.isKeyDown(Keyboard.KEY_DOWN)) {
+			/*	if (Keyboard.isKeyDown(Keyboard.KEY_S) || Keyboard.isKeyDown(Keyboard.KEY_DOWN)) {
 					mainclass.getWorld().getPlayer().down(mainclass);
 				}else if(!(Keyboard.isKeyDown(Keyboard.KEY_S) && Keyboard.isKeyDown(Keyboard.KEY_DOWN)))
 					mainclass.getWorld().getPlayer().down=false;
+			*/
+
+				
+				if (Mouse.isButtonDown(1)) {
+					mainclass.getWorld().getPlayer().down(mainclass);
+				}else if(!Mouse.isButtonDown(1))
+					mainclass.getWorld().getPlayer().down=false;
+				
+//				int mouseX = Mouse.getX();
 			
-	
-				
-				if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
-//					if( !space_ispressed){
-						mainclass.getWorld().getPlayer().jump(mainclass);
-//						space_ispressed=true;
-//					}
-						
-				}else if(!Keyboard.isKeyDown(Keyboard.KEY_SPACE)){
-						space_ispressed=false;
+				float relativeX = Mouse.getX()/(float)Display.getWidth();
+				if(relativeX < 0.4f){
+					mainclass.getWorld().getPlayer().left(mainclass);
+					mainclass.getWorld().getPlayer().right=false;	
+				}else if(relativeX > 0.6f){
+					mainclass.getWorld().getPlayer().right(mainclass);
+					mainclass.getWorld().getPlayer().left=false;
+				}else{
+					mainclass.getWorld().getPlayer().right=false;	
+					mainclass.getWorld().getPlayer().left=false;
 				}
-				
+
 				if (Keyboard.isKeyDown(Keyboard.KEY_J)) {
 					if( !debugPressed){
 						Random r = new 	Random();

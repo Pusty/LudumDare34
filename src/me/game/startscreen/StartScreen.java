@@ -200,7 +200,7 @@ public class StartScreen {
 			Display.setDisplayMode(chosenMode);
 //			 Display.setVSyncEnabled(true);
 			Display.setFullscreen(false); // FULLSCREEn
-			Display.setTitle("16bitCityAdventure");
+			Display.setTitle("A Fox's Garden");
 			Display.setIcon(Render2D.getIcons(System.getProperty("user.dir")
 					+StartScreen.urlSplitter+"img"+StartScreen.urlSplitter+"icon32.png"));
 

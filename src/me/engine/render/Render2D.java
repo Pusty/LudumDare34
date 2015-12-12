@@ -65,9 +65,15 @@ public class Render2D {
 
 	float xmove=0;
 	
-	static boolean sunMode=true;
-	static int sunSpins=-1;
+	public static boolean sunMode=true;
+	public static boolean sunUp=true;
+	public static int sunSpins=-1;
 	
+	public static int dayStatus(){
+		if(sunUp && sunMode)return 1;
+		if(sunUp && !sunMode)return -1;
+		return 0;
+	}
 	private static Color fade(Color ac,Color bc, float percent) {
 		percent = percent<0?0:percent;
 		percent = percent>1?1:percent;
@@ -80,7 +86,7 @@ public class Render2D {
 	
 	private static void renderSun(MainClass m) {
 		float size=2f;
-		float time = (float)((m.getTimeTicks()/1000f)) + (float)Math.PI; //  Set the speed the sun/moon is traveling
+		float time = (float)((m.getTimeTicks()/100f)) + (float)Math.PI; //  Set the speed the sun/moon is traveling
 		float distance = 3.5f;
 		int spins = (int)(time/(Math.PI*2));
 		float degree = (float) ((float)time/(Math.PI*2) - spins);
@@ -88,13 +94,14 @@ public class Render2D {
 				sunMode=!sunMode;
 				sunSpins=spins;
 			}
+		sunUp = degree > 0 && degree < 0.5;
 		GL11.glPushMatrix();
 		Location looking = new Location(0f,0f);
 		GL11.glTranslatef(looking.getX() + (float)(distance * Math.cos(time)), looking.getZ() + (float)(distance * Math.sin(time)), 0f);
 		String renderID = "sun_"+(sunMode?0:1);
 		
 		Color sky = new Color( 	238, 232, 170),night = new Color(86, 60, 92);
-		if(sunMode)
+		if(!sunMode)
 			sky = new Color( 201, 192, 187);
 		float percent = degree;
 		Color interpolate = new Color(255,255,255);
@@ -574,7 +581,7 @@ public class Render2D {
 			Display.setDisplayMode(chosenMode);
 			 Display.setVSyncEnabled(mainclass.getVSync());
 			Display.setFullscreen(mainclass.getFullscreen()); // FULLSCREEn
-			Display.setTitle("16bitCityAdventure");
+			Display.setTitle("A Fox's Garden");
 
 			Display.setIcon(getIcons(System.getProperty("user.dir")
 					+ "\\img\\icon32.png"));

@@ -65,18 +65,13 @@ public class StartClass extends MainClass {
 						sheetloader, a, 0);
 			}
 			
-			
+			/*
 			sheetloader = new SheetLoader(mainFolder+"ghost.png", 1, 4, 32, 32);
 			for (int a = 0; a < 4; a++) {
 				getPictureLoader().ImportFromSheet("ghost_walk_" + String.valueOf(a),
 						sheetloader, a, 0);
-			}
+			}*/
 			
-			sheetloader = new SheetLoader(mainFolder+"stone.png", 1, 4, 32, 64);
-			for (int a = 0; a < 4; a++) {
-				getPictureLoader().ImportFromSheet("stone_" + String.valueOf(a),
-						sheetloader, a, 0);
-			}
 			
 			sheetloader = new SheetLoader(mainFolder+"wall.png", 1, 4, 32, 64);
 			for (int a = 0; a < 4; a++) {
@@ -84,29 +79,24 @@ public class StartClass extends MainClass {
 						sheetloader, a, 0);
 			}
 			
-			sheetloader = new SheetLoader(mainFolder+"fox_statue.png", 1, 4, 32, 64);
+			sheetloader = new SheetLoader(mainFolder+"plant.png", 1, 4, 32, 64);
 			for (int a = 0; a < 4; a++) {
-				getPictureLoader().ImportFromSheet("fox_statue_" + String.valueOf(a),
+				getPictureLoader().ImportFromSheet("plant_" + String.valueOf(a),
 						sheetloader, a, 0);
 			}
 			
 			
-			sheetloader = new SheetLoader(mainFolder+"souls.png", 1, 8, 32, 32);
-			for (int a = 0; a < 8; a++) {
-				getPictureLoader().ImportFromSheet("soul_" + String.valueOf(a),
-						sheetloader, a, 0);
-			}
 			
-			sheetloader = new SheetLoader(mainFolder+"sun.png", 1, 2, 64, 64);
+			sheetloader = new SheetLoader(mainFolder+"planets.png", 1, 2, 32, 32);
 			for (int a = 0; a < 2; a++) {
 				getPictureLoader().ImportFromSheet("sun_" + String.valueOf(a),
 						sheetloader, a, 0);
 			}
 			
-			getPictureLoader().addImage("build", mainFolder+"build.png");
+			getPictureLoader().addImage("energy", mainFolder+"sunenergy.png");
+			getPictureLoader().addImage("stone", mainFolder+"stone.png");
 			
 			
-			getPictureLoader().addImage("lamp", mainFolder+"lamp.png");
 			
 			
 			//Init animations
@@ -225,11 +215,13 @@ public class StartClass extends MainClass {
 				
 				Random random = new Random();
 				random.setSeed(1L);
-				world.addEntity(new EntityBuilding(this,10f,7.25f + random.nextFloat()/2,1,0));
-				for(int i=1;i<10;i++)
-					world.addEntity(new EntityBuilding(this,10f + ((world.getSizeX()-20f)/10)*i,7.25f + random.nextFloat()/2,0,0));
-				world.addEntity(new EntityBuilding(this,world.getSizeX()-10f,7.25f + random.nextFloat()/2,1,0));
+//				world.addEntity(new EntityBuilding(this,10f,7.25f + random.nextFloat()/2,1,0));
+//				for(int i=1;i<10;i++)
+//					world.addEntity(new EntityBuilding(this,10f + ((world.getSizeX()-20f)/10)*i,7.25f + random.nextFloat()/2,0,0));
+//				world.addEntity(new EntityBuilding(this,world.getSizeX()-10f,7.25f + random.nextFloat()/2,1,0));
 
+				world.addEntity(new EntityBuilding(this,10,7.25f + random.nextFloat()/2,0,0));
+				
 				this.setWorld(world);
 				reRender(world);
 //				rerender = true;
@@ -295,7 +287,7 @@ public class StartClass extends MainClass {
 	@Override
 	public void SoundInit() {
 
-	getSoundPlayer().addToBuffer("bg",mainFolder+"music.wav", true,0.1f);
+//	getSoundPlayer().addToBuffer("bg",mainFolder+"music.wav", true,0.1f);
 //	getSoundPlayer().addToBuffer("bg_long",System.getProperty("user.dir") + StartScreen.urlSplitter+"util"+ StartScreen.urlSplitter+"track_1.wav", true,0.2f);
 //	getSoundPlayer().addToBuffer("exp0",System.getProperty("user.dir") + StartScreen.urlSplitter+"util"+ StartScreen.urlSplitter+"exp_0.wav", false,1f);
 //	getSoundPlayer().addToBuffer("exp1",System.getProperty("user.dir") + StartScreen.urlSplitter+"util"+ StartScreen.urlSplitter+"exp_1.wav", false,1f);

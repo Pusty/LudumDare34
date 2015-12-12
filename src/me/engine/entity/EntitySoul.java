@@ -18,11 +18,15 @@ import org.lwjgl.opengl.GL11;
 public class EntitySoul extends EntityLiving {
 
 	int type = 0;
-
-	public EntitySoul(MainClass m, float x, float y) {
-		super(m, x, y, 1f, 1f);
+	boolean fromPlant=false;
+	public EntitySoul(MainClass m, float x,boolean fp) {
+		super(m, x, StartClass.HEIGHT, 1f, 1f);
 		Random r = new Random();
 		type = r.nextInt(8);
+		fromPlant=fp;
+	}
+	public boolean isPlant(){
+		return fromPlant;
 	}
 
 	public String getName() {
@@ -52,7 +56,7 @@ public class EntitySoul extends EntityLiving {
 		if (side)
 			GL11.glRotatef(180, 0, 1f, 0f);
 		glBindTexture(GL_TEXTURE_2D,
-				m.getPictureLoader().getImageAsInteger("soul_" + type));
+				m.getPictureLoader().getImageAsInteger("energy"));
 		glBegin(GL11.GL_QUADS);
 		GL11.glTexCoord2f(0f, 1f);
 		GL11.glVertex2f(-0.5f, 0.5f);
@@ -98,6 +102,7 @@ public class EntitySoul extends EntityLiving {
 		times++;
 		timer++;
 		
+		
 		if(!destroy && through){
 			if(Location.getDistance(new Location(getLocation().x,	StartClass.HEIGHT), main.getWorld().getPlayer().getLocation()) < 0.25f){
 				main.getWorld().removeEntity(this);times=0;destroy=true;return;
@@ -110,13 +115,14 @@ public class EntitySoul extends EntityLiving {
 		nextlocation = this.getLocation();
 		
 
-		
-
+	
 		if(destroy)return;
 
 		if (times > 100) {
 			times=0;
 			through=true;
+			if(isPlant())return;
+
 			float dis = Float.MAX_VALUE;
 			List<Integer> souls=new ArrayList<Integer>();
 			for (int i = 0; i < main.getWorld().getEntityArray().length; i++) {
@@ -138,9 +144,12 @@ public class EntitySoul extends EntityLiving {
 					EntityBuilding bu = (EntityBuilding)main.getWorld().getEntityArray()[nextLocationEntity];
 					if(bu.getBuild()==0){
 						main.getWorld().removeEntity(this);times=0;destroy=true;
-							bu.setBuild(1);
+							if(bu.getType()!=1)	
+								bu.setBuild(1);
+							else if(bu.getType()==1)
+								bu.setBuild(2);
 					}else {
-						if(bu.getBuild()==2){
+						if(bu.getBuild()==2 || bu.getType() == 1){
 							if(bu.getType()==0 && bu.getKind()+1 < 4 && souls.size()>=4){
 								int cur=0;
 								for(int i:souls){

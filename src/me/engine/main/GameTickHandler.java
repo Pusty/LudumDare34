@@ -96,6 +96,8 @@ int tickupdate=40;
 						el.left=false;
 
 				}
+			}  else if (mainclass.getWorld().getEntityArray()[i] instanceof EntityBuilding) {
+				((EntityBuilding)mainclass.getWorld().getEntityArray()[i]).buildingTick(mainclass);
 			} else if (mainclass.getWorld().getEntityArray()[i] instanceof EntityPortal) {
 				continue;
 				/*
