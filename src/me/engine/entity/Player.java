@@ -6,6 +6,7 @@ import static org.lwjgl.opengl.GL11.glBegin;
 import static org.lwjgl.opengl.GL11.glBindTexture;
 
 
+
 import java.util.Random;
 
 import me.engine.entity.EntityLiving;
@@ -20,6 +21,7 @@ import org.lwjgl.opengl.GL11;
 public class Player extends EntityLiving {
 
 	Location mousevelocity;
+	int energy = 0;
 	public Player(MainClass m,float x, float y) {
 		super(m ,x, y,1f,1f);
 //		this.setMainItem(new Item(30));
@@ -51,7 +53,6 @@ public class Player extends EntityLiving {
 	@Override
 	public void setHealth(int h) {
 		super.setHealth(h);
-		main.getSavedData().putData("health", h);
 	}
 
 	Random random = new Random();
@@ -130,14 +131,20 @@ public class Player extends EntityLiving {
 
 	public boolean down = false;
 	public void down(MainClass mainclass) {
-		if(!down){
+		if(!down && getEnergy()>0){
+			energy--;
 			mainclass.getWorld().addEntity(new EntitySoul(mainclass,this.getX(),false));
 			down=true;
 		}
 	}
 
 
-
+	public void setEnergy(int e) {
+		energy=e;
+	}
+	public int getEnergy() {
+		return energy;
+	}
 
 	
 

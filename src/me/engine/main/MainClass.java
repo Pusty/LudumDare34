@@ -88,6 +88,14 @@ public abstract class MainClass {
 	}
 
 	
+	int level=0;
+	int score=0;
+	public int getLevel() {return level;}
+	public void setLevel(int l){level=l;}
+	public int getScore() {return score;}
+	public void setScore(int s){score=s;}
+	public void addScore(int s){score=score+s;}
+	
 	public void setDialog(String from,String text){
 		dialogText=text;
 		dialogFrom=from;

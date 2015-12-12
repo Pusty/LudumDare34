@@ -204,24 +204,16 @@ public class StartClass extends MainClass {
 				}
 				
 
-				if(getSavedData().getData("world") == getSavedData().getData("worldOld") && (float)getSavedData().getData("posX") >= 0)
-					player = new Location((float)getSavedData().getData("posX"),(float)getSavedData().getData("posZ"));
-				getSavedData().putData("worldOld",(int)getSavedData().getData("world"));
-				getSavedData().putData("posX",player.x);
-				getSavedData().putData("posZ",player.z);
 				world.setPlayer(new Player(this, player.x,  player.z));
-				world.getPlayer().setHealth((int)getSavedData().getData("health"));
 //				world.calcLight();
 				
-				Random random = new Random();
-				random.setSeed(1L);
+
 //				world.addEntity(new EntityBuilding(this,10f,7.25f + random.nextFloat()/2,1,0));
 //				for(int i=1;i<10;i++)
 //					world.addEntity(new EntityBuilding(this,10f + ((world.getSizeX()-20f)/10)*i,7.25f + random.nextFloat()/2,0,0));
 //				world.addEntity(new EntityBuilding(this,world.getSizeX()-10f,7.25f + random.nextFloat()/2,1,0));
 
-				world.addEntity(new EntityBuilding(this,10,7.25f + random.nextFloat()/2,0,0));
-				
+				this.initEntitysIL(world);
 				this.setWorld(world);
 				reRender(world);
 //				rerender = true;
@@ -231,10 +223,14 @@ public class StartClass extends MainClass {
 			System.out.println(line);
 			e.printStackTrace();
 		}
+		this.setScore(0);
+		initValuesIL();
+		
 		this.setTimeRunning(true);
 		this.setLoaded();
 		
 		getSavedData().saveToFile("player.txt");
+		setDialogIL();
 	}
 
 	public static boolean rerender = false;
@@ -276,14 +272,52 @@ public class StartClass extends MainClass {
 		else
 		getSavedData().createFromNew();
 		
+		this.setLevel((int) getSavedData().getData("level"));
+		
 
-		load((int)getSavedData().getData("world"));
-
-		this.setDialog("Me",
-				"Where am I? What is this ? Why is everything smelling like cake ?");
+		load(this.getLevel()+1);
+		
+		
 
 	}
+	
+	public void setDialogIL(){
+		if(getLevel()==0){
+			this.setDialog("Game",
+					"Hello and welcome to A Foxs Garden. Use your Mouse to Control. Drop a coin next to the stone to grow a plant. Drop 4 coins to upgrade it. Goal: Reach 200 Score");
+		}
+	}
+	
+	public void initValuesIL(){
+		if(getLevel()==0){
+			this.getWorld().getPlayer().setEnergy(5);
+		}
+	}
 
+	public float getSunSpeedIL() {
+		if(getLevel()==0)
+			return 100f;
+		return 1000f;
+	}
+	
+	
+	public boolean isGoalIL() {
+		if(getLevel()==0){
+			if(getScore()>=200)
+				return true;
+			else
+				return false;
+		}
+		return false;
+	}
+
+	public void initEntitysIL(World world){
+		Random random = new Random();
+		random.setSeed(1L);
+		if(getLevel()==0){
+			world.addEntity(new EntityBuilding(this,10,7.25f + random.nextFloat()/2,0,0));
+		}
+	}
 	@Override
 	public void SoundInit() {
 
@@ -293,6 +327,7 @@ public class StartClass extends MainClass {
 //	getSoundPlayer().addToBuffer("exp1",System.getProperty("user.dir") + StartScreen.urlSplitter+"util"+ StartScreen.urlSplitter+"exp_1.wav", false,1f);
 //	getSoundPlayer().addToBuffer("hit0",System.getProperty("user.dir") + StartScreen.urlSplitter+"util"+ StartScreen.urlSplitter+"hit_0.wav", false,1f);
 	}
+
 
 
 

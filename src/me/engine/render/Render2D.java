@@ -86,7 +86,7 @@ public class Render2D {
 	
 	private static void renderSun(MainClass m) {
 		float size=2f;
-		float time = (float)((m.getTimeTicks()/100f)) + (float)Math.PI; //  Set the speed the sun/moon is traveling
+		float time = (float)((m.getTimeTicks()/((StartClass)m).getSunSpeedIL())) + (float)Math.PI; //  Set the speed the sun/moon is traveling
 		float distance = 3.5f;
 		int spins = (int)(time/(Math.PI*2));
 		float degree = (float) ((float)time/(Math.PI*2) - spins);
@@ -226,6 +226,10 @@ public class Render2D {
 			 GL11.glTranslatef(-0.0f, 0.0f, -25f + camdis);
 			 GL11.glDisable(GL11.GL_LIGHTING);
 			 {
+				 mainclass.getTextPopupArray()[0] = new TextPopup("SCORE: "+mainclass.getScore(), 1, 3f);
+				 if(mainclass.getWorld().getPlayer()!=null)
+					 mainclass.getTextPopupArray()[1] = new TextPopup("ENERGY: "+mainclass.getWorld().getPlayer().getEnergy(), 1, 2f);
+				 mainclass.getTextPopupArray()[2] = new TextPopup("LEVEL: "+mainclass.getLevel(), 1, 5f);
 			 for(TextPopup tp:mainclass.getTextPopupArray()){
 			 if(tp==null)continue;
 			 tp.render(mainclass);
@@ -321,12 +325,12 @@ public class Render2D {
 			GL11.glPushMatrix();
 			GL11.glTranslatef(-16f, -10.5f, 0f);
 			glBindTexture(GL_TEXTURE_2D, mainclass.getPictureLoader()
-					.getImageAsInteger("tile_58"));
+					.getImageAsInteger("tile_3"));
 			glBegin(GL11.GL_QUADS);
 			GL11.glTexCoord2f(0f, 1f);
-			GL11.glVertex2f(0, 10);
+			GL11.glVertex2f(0, 6.5f);
 			GL11.glTexCoord2f(1f, 1f);
-			GL11.glVertex2f(32f, 10f);
+			GL11.glVertex2f(32f, 6.5f);
 			GL11.glTexCoord2f(1f, 0f);
 			GL11.glVertex2f(32f, -4f);
 			GL11.glTexCoord2f(0f, 0f);

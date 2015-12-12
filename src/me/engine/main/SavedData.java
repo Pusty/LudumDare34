@@ -29,13 +29,7 @@ public class SavedData {
 	}
 	public void createFromNew(){
 		//GAMEINFO
-		putData("health",10);
-		putData("posX",-1f);
-		putData("posZ",-1f);
-		putData("world",1);
-		putData("worldOld",0);
-		putData("skill",0);
-		putData("inv","0&Fireball%1&Smash%2&Bloodball%3&Potion%3&Potion%3&Potion");
+		putData("level",0);
 		loaded=true;
 	}
 	

@@ -225,10 +225,10 @@ public class Controls {
 //				int mouseX = Mouse.getX();
 			
 				float relativeX = Mouse.getX()/(float)Display.getWidth();
-				if(relativeX < 0.4f){
+				if(relativeX < 0.45f){
 					mainclass.getWorld().getPlayer().left(mainclass);
 					mainclass.getWorld().getPlayer().right=false;	
-				}else if(relativeX > 0.6f){
+				}else if(relativeX > 0.55f){
 					mainclass.getWorld().getPlayer().right(mainclass);
 					mainclass.getWorld().getPlayer().left=false;
 				}else{

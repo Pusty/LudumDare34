@@ -147,8 +147,11 @@ int tickupdate=40;
 		movingTickEntity(mainclass, mainclass.getWorld().getPlayer());
 		mainclass.getWorld().getPlayer().addRender();
 		if(ticks == tickupdate-1){
-			mainclass.getSavedData().putData("posX",mainclass.getWorld().getPlayer().getX());
-			mainclass.getSavedData().putData("posZ",mainclass.getWorld().getPlayer().getZ());
+			mainclass.getSavedData().putData("level",mainclass.getLevel());
+			if(((StartClass)mainclass).isGoalIL()){
+				mainclass.setLevel(mainclass.getLevel()+1);
+				((StartClass)mainclass).load(mainclass.getLevel()+1);
+			}
 		}
 //		if (mainclass.getWorld().getPlayer().getHealth() < 1)
 //			mainclass.setTimeRunning(false);
@@ -156,6 +159,8 @@ int tickupdate=40;
 //			syncForMultiplayer(mainclass);
 			lastSynced = System.currentTimeMillis();
 		}
+		
+		
 		
 	}
 

@@ -105,7 +105,7 @@ public class EntitySoul extends EntityLiving {
 		
 		if(!destroy && through){
 			if(Location.getDistance(new Location(getLocation().x,	StartClass.HEIGHT), main.getWorld().getPlayer().getLocation()) < 0.25f){
-				main.getWorld().removeEntity(this);times=0;destroy=true;return;
+				main.getWorld().removeEntity(this);main.getWorld().getPlayer().setEnergy(main.getWorld().getPlayer().getEnergy()+1);times=0;destroy=true;return;
 			}
 		}
 		if (timer <= 40 && !b)

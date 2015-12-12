@@ -52,11 +52,13 @@ public class EntityBuilding extends Entity{
 		if(getType()==0){
 			if(getBuild()==1 && Render2D.dayStatus()==-1 && canUpgrade==true){
 				setBuild(2);
+				m.addScore(25);			
 				canUpgrade=false;
 			}else if(Render2D.dayStatus()==-1)
 				canDrop=this.getKind()+1;
 			if(Render2D.dayStatus()==1 && canDrop>0) {
 				m.getWorld().addEntity(new EntitySoul(m, this.getX()+pmR(),true));
+				m.addScore(10);
 				canDrop--;
 			}else if(Render2D.dayStatus()==1)
 				canUpgrade=true;
