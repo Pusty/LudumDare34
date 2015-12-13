@@ -52,7 +52,7 @@ public class TextLoader {
 				e.printStackTrace();
 			}
 
-			index = random.nextInt(text.size());
+			index = 0;
 		}
 	
 }

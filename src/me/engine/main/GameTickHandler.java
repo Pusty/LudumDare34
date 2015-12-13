@@ -2,13 +2,16 @@ package me.engine.main;
 
 
 
+import java.util.Random;
+
 import me.engine.entity.Entity;
 import me.engine.entity.EntityBuilding;
 import me.engine.entity.EntityGhost;
 import me.engine.entity.EntityLiving;
 import me.engine.entity.EntityMonster;
 import me.engine.entity.EntityPortal;
-import me.engine.entity.EntitySoul;
+import me.engine.entity.EntityEnergy;
+import me.engine.entity.EntityText;
 import me.engine.entity.Projectile;
 
 import me.engine.location.Location;
@@ -28,7 +31,8 @@ public class GameTickHandler {
 				while (mainclass.isRunning()) {
 					if (mainclass.isTimeRunning() && mainclass.hasMapLoaded()) {
 						gameTick();
-						mainclass.addTimeTick();
+						if(((StartClass)mainclass).getLevel()<9)
+							mainclass.addTimeTick();
 					}
 					try {
 						Thread.sleep((int) (1000 / 200 / mainclass
@@ -98,7 +102,7 @@ int tickupdate=40;
 				}
 			}  else if (mainclass.getWorld().getEntityArray()[i] instanceof EntityBuilding) {
 				((EntityBuilding)mainclass.getWorld().getEntityArray()[i]).buildingTick(mainclass);
-				EntityBuilding bu = ((EntityBuilding)mainclass.getWorld().getEntityArray()[i]);
+//				EntityBuilding bu = ((EntityBuilding)mainclass.getWorld().getEntityArray()[i]);
 			} else if (mainclass.getWorld().getEntityArray()[i] instanceof EntityPortal) {
 				continue;
 				/*
@@ -159,15 +163,22 @@ int tickupdate=40;
 			((StartClass)mainclass).load(mainclass.getLevel()+1);
 		}
 		
+		if(mainclass.getTimeTicks()%40==0)
+			((StartClass)mainclass).tickEventIL();
 		if(ticks == tickupdate-1){
 			mainclass.getSavedData().putData("level",mainclass.getLevel());
-			((StartClass)mainclass).tickEventIL();
 			if(((StartClass)mainclass).isGoalIL()){
-				mainclass.setDialog("game", "Good job! Next Level!");
+				Random r = new Random();
+				String[] texts = {"Good job! Next Level!","Great!","Good job!","To the next level!","You did it!","YAAY!","Amazing!","Awesome!"};
+				mainclass.setDialog("game", texts[r.nextInt(texts.length)]);
+				mainclass.getSoundPlayer().playSound("win", false);
 				mainclass.setTimeRunning(false);
 				gameStatus=1;
 			}else if(((StartClass)mainclass).isGameOverIL()){
-				mainclass.setDialog("game", "Ohh :(");
+				Random r = new Random();
+				String[] texts = {"Ohh :(","Game over. Please try again","You can do this!","Restart","Game over","Please try again"};
+				mainclass.setDialog("game", texts[r.nextInt(texts.length)]);
+				mainclass.getSoundPlayer().playSound("gameover", false);
 				mainclass.setTimeRunning(false);
 				gameStatus=2;
 
@@ -198,7 +209,7 @@ int tickupdate=40;
 				float z = living.getLocation().getZ();
 				if(living instanceof EntityGhost)
 					z = StartClass.HEIGHT + (float)Math.sin(x)/3;
-				if(living instanceof EntitySoul)
+				if(living instanceof EntityEnergy)
 					z = StartClass.HEIGHT + (float)Math.sin(System.currentTimeMillis()/100d*mainclass.getTimeSpeed() + living.getIndex())/3;
 				if (living.getTempVelocity() != null)
 					x = x + living.getTempVelocity().getX();
@@ -216,14 +227,17 @@ int tickupdate=40;
 								done=false;break;
 						}
 					}
+					
+					if(GameTickHandler.inRange(mainclass.getWorld().getPlayer().getLocation(), new Location(x,z), 0.5f))
+						((EntityMonster)living).cWE(mainclass,mainclass.getWorld().getPlayer());
 				}
 
-			
+				if(living instanceof EntityText){}else{
 				if (x < 0 || x > mainclass.getWorld().getSizeX() - 1)
 					done = false;
 				if (x2 < 0 || x2 > mainclass.getWorld().getSizeX() - 1)
 					done2 = false;
-
+				}
 				
 				if (done) {
 					living.getLocation().setX(x);

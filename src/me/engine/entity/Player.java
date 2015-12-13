@@ -133,7 +133,8 @@ public class Player extends EntityLiving {
 	public void down(MainClass mainclass) {
 		if(!down && getEnergy()>0){
 			energy--;
-			mainclass.getWorld().addEntity(new EntitySoul(mainclass,this.getX(),false));
+			mainclass.getWorld().addEntity(new EntityEnergy(mainclass,this.getX(),false));
+			mainclass.getSoundPlayer().playSound("coindrop", true);
 			down=true;
 		}
 	}

@@ -1,13 +1,8 @@
 package me.engine.main;
 
 
-import java.util.Random;
-
 import me.engine.entity.Entity;
-import me.engine.entity.EntityCrow;
-import me.engine.entity.EntityGhost;
 import me.engine.entity.EntityPortal;
-import me.engine.entity.EntitySoul;
 import me.engine.location.Location;
 import me.game.main.StartClass;
 
@@ -81,21 +76,6 @@ public class Controls {
 	public static boolean MOUSE_CONTROL=true;
 	
 	public void controls() {
-		
-		if (!ispressedDebug && Keyboard.isKeyDown(Keyboard.KEY_F1)) {
-			ispressedDebug = true;
-			mainclass.toggleDebug();
-		} else if (ispressedDebug && !Keyboard.isKeyDown(Keyboard.KEY_F1)) {
-			ispressedDebug = false;
-		}
-		
-		if (!f5pressed && Keyboard.isKeyDown(Keyboard.KEY_F5)) {
-			f5pressed = true;
-			mainclass.getWorld().setDay(!mainclass.getWorld().isDay());
-		} else if (f5pressed && !Keyboard.isKeyDown(Keyboard.KEY_F5)) {
-			f5pressed = false;
-		}
-
 		if (true) {
 
 			int mx = Mouse.getX();
@@ -138,6 +118,10 @@ public class Controls {
 				
 			}else if(escPressed && !Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)){escPressed=false;}
 			
+			if(Keyboard.isKeyDown(Keyboard.KEY_E) && mainclass.getDialog()==null){
+				((StartClass)mainclass).setDialogIL();
+			}
+			
 			
 			if(mainclass.isTimeRunning()){
 			mainclass.getWorld().getPlayer()
@@ -152,26 +136,8 @@ public class Controls {
 			if (!Mouse.isButtonDown(0))
 				ispressed = false;
 
-			if (!Keyboard.isKeyDown(Keyboard.KEY_C))
-				ispressedChange = false;
+			
 
-			
-			
-			if(Keyboard.isKeyDown(Keyboard.KEY_E) && mainclass.getDialog() == null && mainclass.getGui() == null){
-				e_ispressed=true;
-				Random random = new Random();
-				String endtext= null;
-				String name=null;
-				if(endtext == null){
-					endtext = mainclass.getWorld().getPlayer().getDialogText(random);
-					name = mainclass.getWorld().getPlayer().getTextureName(-1);
-				}
-				if(endtext != null)
-				mainclass.setDialog(name,endtext);
-				
-			}else if(!Keyboard.isKeyDown(Keyboard.KEY_E)){
-				e_ispressed=false;
-			}
 			
 			{
 				if(mainclass.getGui() != null)
@@ -197,14 +163,6 @@ public class Controls {
 
 
 			if (mainclass.isTimeRunning() && mainclass.hasMapLoaded()) {
-
-				if (Keyboard.isKeyDown(Keyboard.KEY_1))
-					mainclass.setTimeSpeed(1f);
-				if (Keyboard.isKeyDown(Keyboard.KEY_2))
-					mainclass.setTimeSpeed(0.5f);
-				if (Keyboard.isKeyDown(Keyboard.KEY_3))
-					mainclass.setTimeSpeed(0.1f);
-
 				/*
 				if (Keyboard.isKeyDown(Keyboard.KEY_D) || Keyboard.isKeyDown(Keyboard.KEY_RIGHT)) {
 					mainclass.getWorld().getPlayer().right(mainclass);
@@ -241,7 +199,7 @@ public class Controls {
 					mainclass.getWorld().getPlayer().left=false;
 				}
 			}else{
-				if((Keyboard.isKeyDown(Keyboard.KEY_D) || Keyboard.isKeyDown(Keyboard.KEY_RIGHT)) && (Keyboard.isKeyDown(Keyboard.KEY_A) || Keyboard.isKeyDown(Keyboard.KEY_LEFT))){
+				if((Keyboard.isKeyDown(Keyboard.KEY_S) || Keyboard.isKeyDown(Keyboard.KEY_DOWN)) || ((Keyboard.isKeyDown(Keyboard.KEY_D) || Keyboard.isKeyDown(Keyboard.KEY_RIGHT)) && (Keyboard.isKeyDown(Keyboard.KEY_A) || Keyboard.isKeyDown(Keyboard.KEY_LEFT)))){
 					mainclass.getWorld().getPlayer().down(mainclass);
 				}else {
 					mainclass.getWorld().getPlayer().down=false;
@@ -262,62 +220,13 @@ public class Controls {
 			}else if(!Keyboard.isKeyDown(Keyboard.KEY_M)){
 				misPressed=false;
 			}
-				
-				
-
-				if (Keyboard.isKeyDown(Keyboard.KEY_J)) {
-					if( !debugPressed){
-						Random r = new 	Random();
-						mainclass.getWorld().addEntity(new EntityCrow(mainclass,r.nextBoolean()));
-						debugPressed=true;
-					}
-						
-				}else if(!Keyboard.isKeyDown(Keyboard.KEY_J)){
-					debugPressed=false;
-				}
-				
-				
-				if (Keyboard.isKeyDown(Keyboard.KEY_H)) {
-					if( !debug2Pressed){
-						mainclass.getWorld().addEntity(new EntityGhost(mainclass,mainclass.getWorld().getPlayer().getX(),mainclass.getWorld().getPlayer().getZ()));
-						debug2Pressed=true;
-					}
-						
-				}else if(!Keyboard.isKeyDown(Keyboard.KEY_H)){
-					debug2Pressed=false;
-				}
-				
-				
-				if(Keyboard.isKeyDown(Keyboard.KEY_T)){
-					mainclass.getWorld().getPlayer().addStatus("SKILL1", 9999, false);
-				}
-				
-				if (Keyboard.isKeyDown(Keyboard.KEY_U)) {
-					Location to=new Location(0,0);
-					for(Entity e:mainclass.getWorld().getEntityArray()){
-						if(e==null || !(e instanceof EntityPortal))continue;
-						if(((EntityPortal)e).isFrom() && ((EntityPortal)e).getPortal() == (int)mainclass.getSavedData().getData("worldOld"))to = e.getLocation().clone();
-					}
-					mainclass.getWorld().getPlayer().getLocation().set(to);
-				}
-				
-		
-				if (Keyboard.isKeyDown(Keyboard.KEY_X)) {
-					debugAnimation=0;
-					mainclass.getSoundPlayer().unpauseAll();
-				}
-				if (Keyboard.isKeyDown(Keyboard.KEY_C)) {
-					debugAnimation=1;
-					mainclass.getSoundPlayer().pauseAll();
-				}
-				if (Keyboard.isKeyDown(Keyboard.KEY_V)) {
-					debugAnimation=2;
-					mainclass.getSoundPlayer().stopSound("bg");
-					mainclass.getSoundPlayer().stopSound("bg_long");
-				}
-				if (Keyboard.isKeyDown(Keyboard.KEY_B)) {
-					debugAnimation=3;
-				}
+			
+			if((Keyboard.isKeyDown(Keyboard.KEY_D) || Keyboard.isKeyDown(Keyboard.KEY_RIGHT)) 
+					|| (Keyboard.isKeyDown(Keyboard.KEY_A) || Keyboard.isKeyDown(Keyboard.KEY_LEFT) || (Keyboard.isKeyDown(Keyboard.KEY_S) || Keyboard.isKeyDown(Keyboard.KEY_DOWN))))
+				Controls.MOUSE_CONTROL=false;
+			
+			if(Mouse.isButtonDown(0) || Mouse.isButtonDown(1))
+				Controls.MOUSE_CONTROL=true;	
 				
 				
 

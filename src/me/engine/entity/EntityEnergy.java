@@ -15,11 +15,11 @@ import me.game.main.StartClass;
 
 import org.lwjgl.opengl.GL11;
 
-public class EntitySoul extends EntityLiving {
+public class EntityEnergy extends EntityLiving {
 
 	int type = 0;
 	boolean fromPlant=false;
-	public EntitySoul(MainClass m, float x,boolean fp) {
+	public EntityEnergy(MainClass m, float x,boolean fp) {
 		super(m, x, StartClass.HEIGHT, 1f, 1f);
 		Random r = new Random();
 		type = r.nextInt(8);
@@ -30,7 +30,7 @@ public class EntitySoul extends EntityLiving {
 	}
 
 	public String getName() {
-		return "Soul";
+		return "Energy";
 	}
 
 	public String getTextureName(int i) {
@@ -105,7 +105,12 @@ public class EntitySoul extends EntityLiving {
 		
 		if(!destroy && through){
 			if(Location.getDistance(new Location(getLocation().x,	StartClass.HEIGHT), main.getWorld().getPlayer().getLocation()) < 0.25f){
-				main.getWorld().removeEntity(this);main.getWorld().getPlayer().setEnergy(main.getWorld().getPlayer().getEnergy()+1);times=0;destroy=true;return;
+				main.getWorld().removeEntity(this);
+				main.getWorld().getPlayer().setEnergy(main.getWorld().getPlayer().getEnergy()+1);
+				main.getSoundPlayer().playSound("coinpickup", true);
+				times=0;
+				destroy=true;
+				return;
 			}
 		}
 		if (timer <= 40 && !b)
@@ -129,7 +134,7 @@ public class EntitySoul extends EntityLiving {
 				Entity e = main.getWorld().getEntityArray()[i];
 				if (e == null)
 					continue;
-				if(e instanceof EntitySoul && Location.getDistance(new Location(getLocation().x, StartClass.HEIGHT), e.getLocation()) < 1f)
+				if(e instanceof EntityEnergy && Location.getDistance(new Location(getLocation().x, StartClass.HEIGHT), e.getLocation()) < 1f)
 					souls.add(i);
 				if (!(e instanceof EntityBuilding))
 					continue;
@@ -148,6 +153,7 @@ public class EntitySoul extends EntityLiving {
 								bu.setBuild(1);
 							else if(bu.getType()==1)
 								bu.setBuild(2);
+							main.getSoundPlayer().playSound("upgrade", true);
 					}else {
 						if(bu.getBuild()==2 || bu.getType() == 1){
 							if(bu.getType()==0 && bu.getKind()+1 < 4 && souls.size()>=4){
@@ -159,6 +165,7 @@ public class EntitySoul extends EntityLiving {
 								}
 								bu.setKind(bu.getKind()+1);
 								bu.setBuild(1);
+								main.getSoundPlayer().playSound("upgrade", true);
 							}else if(bu.getType()==1 && bu.getKind()+1 < 4 && souls.size()>=(bu.getKind()+1)*(bu.getKind()+1)){
 								int cur=0;
 								for(int i:souls){
@@ -168,6 +175,37 @@ public class EntitySoul extends EntityLiving {
 								}
 								bu.setKind(bu.getKind()+1);
 								bu.setBuild(1);
+								main.getSoundPlayer().playSound("upgrade", true);
+							}else if(bu.getType()==2 && bu.getKind()+1 < 4 && souls.size()>=(bu.getKind()+1)){
+								int cur=0;
+								for(int i:souls){
+									if(cur>=(bu.getKind()+1))break;
+									main.getWorld().getEntityArray()[i]=null;
+									cur++;
+								}
+								bu.setKind(bu.getKind()+1);
+								bu.setBuild(1);
+								main.getSoundPlayer().playSound("upgrade", true);
+							}else if(bu.getType()==3 && bu.getKind()+1 < 4 && souls.size()>=(bu.getKind()+1)){
+								int cur=0;
+								for(int i:souls){
+									if(cur>=(bu.getKind()+1))break;
+									main.getWorld().getEntityArray()[i]=null;
+									cur++;
+								}
+								bu.setKind(bu.getKind()+1);
+								bu.setBuild(1);
+								main.getSoundPlayer().playSound("upgrade", true);
+							}else if(bu.getType()==4 && bu.getKind()+1 < 4 && souls.size()>=1){
+								int cur=0;
+								for(int i:souls){
+									if(cur>=1)break;
+									main.getWorld().getEntityArray()[i]=null;
+									cur++;
+								}
+								bu.setKind(bu.getKind()+1);
+								bu.setBuild(1);
+								main.getSoundPlayer().playSound("upgrade", true);
 							}
 						}
 					}

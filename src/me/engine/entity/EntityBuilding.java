@@ -49,7 +49,7 @@ public class EntityBuilding extends Entity{
 	public void buildingTick(MainClass m){
 		if(this.getBuild()==0)return;
 		if(getType()==1)return;
-		if(getType()==0){
+		else if(getType()==0){
 			if(getBuild()==1 && Render2D.dayStatus()==-1 && canUpgrade==true){
 				setBuild(2);
 				m.addScore(25);			
@@ -57,10 +57,53 @@ public class EntityBuilding extends Entity{
 			}else if(Render2D.dayStatus()==-1)
 				canDrop=this.getKind()+1;
 			if(Render2D.dayStatus()==1 && canDrop>0) {
-				m.getWorld().addEntity(new EntitySoul(m, this.getX()+pmR(),true));
+				m.getWorld().addEntity(new EntityEnergy(m, this.getX()+pmR(),true));
+				main.getSoundPlayer().playSound("coindrop", true);
 				m.addScore(10);
 				canDrop--;
 			}else if(Render2D.dayStatus()==1)
+				canUpgrade=true;
+		}
+		else if(getType()==2){
+			if(getBuild()==1 && Render2D.dayStatus()==-1 && canUpgrade==true){
+				setBuild(2);
+				if(getKind()==3)
+					m.addScore(200);
+				else
+					m.addScore(100);			
+				canUpgrade=false;
+			}
+			if(Render2D.dayStatus()==1)
+				canUpgrade=true;
+		}
+		else if(getType()==3){
+			if(getBuild()==1 && Render2D.dayStatus()==-1 && canUpgrade==true){
+				setBuild(2);
+				if(getKind()==3)
+					m.addScore(50);
+				else
+					m.addScore(25);	
+				canDrop=(this.getKind()+1)*2;
+				canUpgrade=false;
+			}
+			if(Render2D.dayStatus()==-1 && canDrop>0) {
+				m.getWorld().addEntity(new EntityEnergy(m, this.getX()+pmR(),true));
+				main.getSoundPlayer().playSound("coindrop", true);
+				m.addScore(10);
+				canDrop--;
+			}
+			if(Render2D.dayStatus()==1)
+				canUpgrade=true;
+		}	else if(getType()==4){
+			if(getBuild()==1 && Render2D.dayStatus()==-1 && canUpgrade==true){
+				setBuild(2);
+				if(getKind()==3)
+					m.addScore(100);
+				else
+					m.addScore(35);			
+				canUpgrade=false;
+			}
+			if(Render2D.dayStatus()==1)
 				canUpgrade=true;
 		}
 	}
@@ -72,7 +115,13 @@ public class EntityBuilding extends Entity{
 		if(type==0)
 			name = "plant_";
 		else if(type==1)
-		name = "wall_";
+			name = "wall_";
+		else if(type==2)
+			name = "plantbonus_";
+		else if(type==3)
+			name = "plantnight_";
+		else if(type==4)
+			name = "plantbomb_";
 		if(build==0)
 			name = "stone";
 		

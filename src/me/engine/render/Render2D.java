@@ -19,6 +19,8 @@ import me.engine.location.Location;
 import me.engine.text.TextPopup;
 import me.engine.world.Chunk;
 import me.engine.entity.Entity;
+import me.engine.entity.EntityEnergy;
+import me.engine.entity.EntityText;
 import me.engine.main.GameTickHandler;
 import me.engine.main.MainClass;
 import me.game.main.StartClass;
@@ -201,11 +203,13 @@ public class Render2D {
 			
 
 				
-	
+				float tZ=0f;
 				for(int e=0;e<mainclass.getWorld().getEntityArray().length;e++){
 					Entity en = mainclass.getWorld().getEntityArray()[e];
 					if(en==null)continue;
-					if(en.getZ()+0.1f <= mainclass.getWorld().getPlayer().getZ())continue;
+					tZ=en.getZ();
+					if(en instanceof EntityEnergy)tZ=StartClass.HEIGHT;
+					if(tZ <= mainclass.getWorld().getPlayer().getZ())continue;
 						if(GameTickHandler.inRange(mainclass.getWorld().getPlayer().getLocation(), en.getLocation(), 20))
 					en.render(mainclass);
 				}
@@ -213,8 +217,10 @@ public class Render2D {
 				for(int e=0;e<mainclass.getWorld().getEntityArray().length;e++){
 					Entity en = mainclass.getWorld().getEntityArray()[e];
 					if(en==null)continue;
-					if(en.getZ()+0.1f > mainclass.getWorld().getPlayer().getZ())continue;
-						if(GameTickHandler.inRange(mainclass.getWorld().getPlayer().getLocation(), en.getLocation(), 20))
+					tZ=en.getZ();
+					if(en instanceof EntityEnergy)tZ=StartClass.HEIGHT;
+					if(tZ > mainclass.getWorld().getPlayer().getZ())continue;
+						if(GameTickHandler.inRange(mainclass.getWorld().getPlayer().getLocation(), en.getLocation(), 20) || en instanceof EntityText)
 					en.render(mainclass);
 				}
 		
@@ -225,11 +231,14 @@ public class Render2D {
 			 GL11.glTranslatef(-0.0f, 0.0f, -camdis);
 			 GL11.glTranslatef(-0.0f, 0.0f, -25f + camdis);
 			 GL11.glDisable(GL11.GL_LIGHTING);
-			 {
+			if(((StartClass)mainclass).getLevel()<9) {
 				 mainclass.getTextPopupArray()[0] = new TextPopup("SCORE: "+mainclass.getScore(), 1, 3f);
 				 if(mainclass.getWorld().getPlayer()!=null)
-					 mainclass.getTextPopupArray()[1] = new TextPopup("ENERGY: "+mainclass.getWorld().getPlayer().getEnergy(), 1, 2f);
-				 mainclass.getTextPopupArray()[2] = new TextPopup("LEVEL: "+mainclass.getLevel(), 1, 5f);
+					 mainclass.getTextPopupArray()[1] = new TextPopup("ENERGY: "+mainclass.getWorld().getPlayer().getEnergy(), 1, 4f);
+				 mainclass.getTextPopupArray()[2] = new TextPopup("LEVEL: "+mainclass.getLevel(), 1, 6f);
+				 
+				 mainclass.getTextPopupArray()[3] = new TextPopup(((StartClass)mainclass).getInfoTextIL(), 1, 1f);
+				 
 			 for(TextPopup tp:mainclass.getTextPopupArray()){
 			 if(tp==null)continue;
 			 tp.render(mainclass);

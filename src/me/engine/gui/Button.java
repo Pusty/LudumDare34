@@ -38,10 +38,10 @@ String text;
 		GL11.glTranslatef(loc.x+0.5f, loc.z+0.5f, 0f);
 		if(timer<0)
 			glBindTexture(GL_TEXTURE_2D,
-					m.getPictureLoader().getImageAsInteger("item_0"));
+					m.getPictureLoader().getImageAsInteger("tile_13"));
 		else
 			glBindTexture(GL_TEXTURE_2D,
-					m.getPictureLoader().getImageAsInteger("item_8"));
+					m.getPictureLoader().getImageAsInteger("tile_8"));
 		glBegin(GL_QUADS);
 		GL11.glTexCoord2f(0f, 1f);
 		GL11.glVertex2f(0f,this.getSizeY());

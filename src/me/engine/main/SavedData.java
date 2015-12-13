@@ -10,7 +10,7 @@ import java.util.HashMap;
 
 public class SavedData {
 	HashMap<String,Object> data;
-	boolean loaded=false;
+	public boolean loaded=false;
 	public SavedData(){
 		data = new HashMap<String,Object>();
 	}

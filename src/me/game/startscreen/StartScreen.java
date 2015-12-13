@@ -2,6 +2,7 @@ package me.game.startscreen;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
@@ -69,9 +70,11 @@ public class StartScreen {
 		soundloader.removeALData();
 		Display.destroy();
 		if(startGame==1)
-		{this.startGame(false);}
+		{this.startGame(false,-1);}
 		else if(startGame==2)
-		{this.startGame(true);}
+		{this.startGame(true,-1);}
+		else if(startGame>=3)
+		{this.startGame(false,startGame-3);}
 		else {
 			System.exit(0);
 		}
@@ -83,6 +86,7 @@ public class StartScreen {
 	boolean mouse=false;
 	boolean fullscreen=false;
 	boolean vsyncbool=false;
+	boolean enterdown=false;
 	int soundint=10;
 	int screenX=-1;
 	int screenY=-1;
@@ -91,7 +95,7 @@ public class StartScreen {
 	private void render() throws LWJGLException{
 		if(side == 0){
 		Render2D.renderText(picloader, "Start",new Location(-3,1.5f),5f/10f);
-		Render2D.renderText(picloader, "",new Location(-3,0f),5f/10f);
+		Render2D.renderText(picloader, "Level Select",new Location(-3,0f),5f/10f);
 		Render2D.renderText(picloader, "Option",new Location(-3,-1.5f),5f/10f);
 		}else if(side == 1){
 		String res = "R: "+screenX+"/"+screenY;
@@ -105,9 +109,10 @@ public class StartScreen {
 		Render2D.renderText(picloader, vsync,new Location(-3,1.5f),5f/vsync.length());
 		Render2D.renderText(picloader, sound,new Location(-3,0f),5f/sound.length());
 		Render2D.renderText(picloader, "Next",new Location(-3,-1.5f),5f/10f);
-		}else if(side == 3){
-			String text = "Server";
-		Render2D.renderText(picloader, text,new Location(-3,1.5f),5f/text.length());
+		}else if(side >= 3){
+		Render2D.renderText(picloader, "Level "+(0+2*(side-3)),new Location(-3,1.5f),5f/10f);
+		Render2D.renderText(picloader, "Level "+(1+2*(side-3)),new Location(-3,0f),5f/10f);
+		Render2D.renderText(picloader, "Next",new Location(-3,-1.5f),5f/10f);
 		}else if(side == -1){
 			String f1 = "Play Game";
 			String f2 = "New Game";
@@ -116,6 +121,10 @@ public class StartScreen {
 		Render2D.renderText(picloader, "Back",new Location(-3,-1.5f),5f/10f);
 		}
 		if(ticks>0){ticks--;return;}
+		
+		if(Keyboard.isKeyDown(28)){
+			isAlive=false;startGame=1;return;
+		}
 		
 		if(Mouse.isButtonDown(0) && !mouse){
 			mouse=true;
@@ -129,6 +138,7 @@ public class StartScreen {
 			ticks=5;
 			
 				 if(buttonindex == 0){side=-1;}
+			else if(buttonindex == 1){side=3;}
 			else if(buttonindex == 2){side=1;}
 			
 			else if(buttonindex == 3){
@@ -143,9 +153,19 @@ public class StartScreen {
 			else if(buttonindex == 6){vsyncbool=!vsyncbool;}
 			else if(buttonindex == 7){soundint++;if(soundint>10)soundint=0;}
 			else if(buttonindex == 8){side=0;}
-			else if(buttonindex == 9){}
-			else if(buttonindex == 10){}
-			else if(buttonindex == 11){}
+			else if(buttonindex >= 9){
+				int cur = buttonindex-3*side;
+				if(cur==2){
+					if(side+1>7)
+						side=0;
+					else
+						side=side+1;
+				}else {
+					isAlive=false;
+					startGame=3+cur+2*(side-3);
+				}
+			}
+			
 			else if(buttonindex == -1){side=0;}
 			else if(buttonindex == -2){isAlive=false;startGame=2;}
 			else if(buttonindex == -3){isAlive=false;startGame=1;}
@@ -250,8 +270,14 @@ public class StartScreen {
 		return;
 	}
 	
-	public void startGame(boolean start){
+	public void startGame(boolean start,int level){
 		StartClass gameclass = new StartClass();
+		if(level!=-1){
+			gameclass.setLevel(level);
+			gameclass.getSavedData().loaded=true;
+			gameclass.getSavedData().putData("level", level);
+			gameclass.getSavedData().saveToFile("player.txt");
+		}
 		gameclass.setWidth(this.screenX);
 		gameclass.setHeight(this.screenY);
 		gameclass.setFullscreen(this.fullscreen);

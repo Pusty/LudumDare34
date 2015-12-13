@@ -11,18 +11,20 @@ import java.util.Random;
 
 
 
+
 import me.engine.location.Location;
 import me.engine.main.Controls;
 import me.engine.main.GameTickHandler;
-import me.engine.main.Inventory;
 import me.engine.main.MainClass;
 import me.engine.block.HandledBlock;
 import me.engine.entity.EntityBuilding;
-import me.engine.entity.EntityCrow;
+import me.engine.entity.EntityDestroyer;
+import me.engine.entity.EntityShear;
+import me.engine.entity.EntityShoe;
+import me.engine.entity.EntityText;
 import me.engine.entity.Player;
 import me.engine.gui.Button;
 import me.engine.gui.GuiScreen;
-import me.engine.gui.SkillInventory;
 import me.engine.world.LevelScript;
 import me.engine.world.World;
 import me.engine.render.AnimationHandler;
@@ -74,6 +76,16 @@ public class StartClass extends MainClass {
 						sheetloader, a, 0);
 			}
 			
+			sheetloader = new SheetLoader(mainFolder+"shear.png", 1, 4, 32, 32);
+			for (int a = 0; a < 4; a++) {
+				getPictureLoader().ImportFromSheet("shear_walk_" + String.valueOf(a),
+						sheetloader, a, 0);
+			}
+			sheetloader = new SheetLoader(mainFolder+"destroyer.png", 1, 4, 32, 32);
+			for (int a = 0; a < 4; a++) {
+				getPictureLoader().ImportFromSheet("destroyer_walk_" + String.valueOf(a),
+						sheetloader, a, 0);
+			}
 			
 			sheetloader = new SheetLoader(mainFolder+"wall.png", 1, 4, 32, 64);
 			for (int a = 0; a < 4; a++) {
@@ -87,6 +99,30 @@ public class StartClass extends MainClass {
 						sheetloader, a, 0);
 			}
 			
+			
+			sheetloader = new SheetLoader(mainFolder+"plant-b.png", 1, 4, 32, 64);
+			for (int a = 0; a < 4; a++) {
+				getPictureLoader().ImportFromSheet("plantbonus_" + String.valueOf(a),
+						sheetloader, a, 0);
+			}
+			
+			sheetloader = new SheetLoader(mainFolder+"plant-b.png", 1, 4, 32, 64);
+			for (int a = 0; a < 4; a++) {
+				getPictureLoader().ImportFromSheet("plantbonus_" + String.valueOf(a),
+						sheetloader, a, 0);
+			}
+			
+			sheetloader = new SheetLoader(mainFolder+"plant-e.png", 1, 4, 32, 64);
+			for (int a = 0; a < 4; a++) {
+				getPictureLoader().ImportFromSheet("plantbomb_" + String.valueOf(a),
+						sheetloader, a, 0);
+			}
+			
+			sheetloader = new SheetLoader(mainFolder+"plant-n.png", 1, 4, 32, 64);
+			for (int a = 0; a < 4; a++) {
+				getPictureLoader().ImportFromSheet("plantnight_" + String.valueOf(a),
+						sheetloader, a, 0);
+			}
 			
 			
 			sheetloader = new SheetLoader(mainFolder+"planets.png", 1, 2, 32, 32);
@@ -109,6 +145,14 @@ public class StartClass extends MainClass {
 //			AnimationHandler.getHandler("enemy").addAnimation(38, "walk", 100, 1, true);
 			AnimationHandler.addHandler("shoe", 1);
 			AnimationHandler.getHandler("shoe").addAnimation("shoe", "walk", 100, 1, true);
+			
+			AnimationHandler.addHandler("shear", 1);
+			AnimationHandler.getHandler("shear").addAnimation("shear", "walk", 100, 1, true);
+			
+			AnimationHandler.addHandler("destroyer", 1);
+			AnimationHandler.getHandler("destroyer").addAnimation("destroyer", "walk", 100, 1, true);
+			
+			
 			
 			AnimationHandler.addHandler("player", 2);
 			AnimationHandler.getHandler("player").addAnimation("player", "walk", 100, 1, true);
@@ -180,10 +224,11 @@ public class StartClass extends MainClass {
 				{
 					FileInputStream fi = new FileInputStream(f);
 					InputStreamReader isr = new InputStreamReader(fi);
+					@SuppressWarnings("resource")
 					BufferedReader br = new BufferedReader(isr);
 					line = br.readLine();
 //					int index = 0;
-					int se = 40;
+					int se = 60;
 					List<int[]> blockarray = new ArrayList<int[]>();
 					while (line != null) {
 						int blocks = line.split(",").length;
@@ -212,7 +257,13 @@ public class StartClass extends MainClass {
 				Render2D.sunMode=true;
 				Render2D.sunUp=true;
 				Render2D.sunSpins=-1;
-				this.resetTimeTicks();
+				if(getLevel()<9){
+					this.resetTimeTicks();
+				}else {
+					this.setTimeTick((int) (Math.PI*1500));
+					world.addEntity(new EntityText(this,world.getSizeX()+1f,"Thank you for playing my game! This game was made for Ludum Dare 34 by Pusty. I hope you liked it! :D"));
+				}
+				
 //				world.calcLight();
 				
 
@@ -263,7 +314,7 @@ public class StartClass extends MainClass {
 		gui.setGuiPart(1, new Button(new Location(-12,-10),6,2,0,18,0,40,"Save"){
 			@Override
 			public void buttonClick(MainClass m,float mx,float mz){
-				
+				m.getSavedData().saveToFile("player.txt");
 //				Inventory.useItem(m, ((SkillInventory)(m.getGui().getGuiPart(1))).getItemIndex());
 			}
 		});
@@ -285,44 +336,167 @@ public class StartClass extends MainClass {
 
 		load(this.getLevel()+1);
 		
-		
-
+	}
+	
+	private int countFlowers() {
+		int count=0;
+		for(int i=0;i<this.getWorld().getEntityArray().length;i++)	{
+			if(getWorld().getEntityArray()[i]==null  || !(getWorld().getEntityArray()[i] instanceof EntityBuilding))continue;
+			EntityBuilding bu = (EntityBuilding)getWorld().getEntityArray()[i];
+			if(bu.getBuild()!=0 && bu.getType()==0)count++;
+		}
+		return count;
 	}
 	
 	public void setDialogIL(){
 		if(getLevel()==0){
 			this.setDialog("Game",
 					"Hello and welcome to A Foxs Garden. Use your Mouse to Control. Drop a coin next to the stone to grow a plant. Drop 4 coins to upgrade it. Goal: Reach 200 Score");
-		}
-		if(getLevel()==1){
+		}else if(getLevel()==1){
 			this.setDialog("Game",
 					"When the sun rises enemys will appear! Protect your flower and build walls! Goal: Defeat one wave");
-		}
-		if(getLevel()==2){
+		}else if(getLevel()==2){
 			this.setDialog("Game",
-					"Defent the plants! More enemies will approach! Goal: Reach 300 Score");
+					"Defend the plants! More enemies will approach! Goal: Reach 300 Score");
+		}else if(getLevel()==3){
+			this.setDialog("Game",
+					"You have got a new flower kind! Upgrading them gives 100 Score. Goal: Reach 2000 Score");
+		}else if(getLevel()==4){
+			this.setDialog("Game",
+					"If a wall reaches the fourth upgrade shoes and shears can not destory it. Goal: Survive 4 waves");
+		}else if(getLevel()==5){
+			this.setDialog("Game",
+					"Destroyer can not pass through fully upgrades walls. Goal: Survive 4 waves");
+		}else if(getLevel()==6){
+			this.setDialog("Game",
+					"Night flowers drop double the amount you gave them. Goal: Survive 5 waves");
+		}else if(getLevel()==7){
+			this.setDialog("Game",
+					"Bomb flowers will break a Destroyer if they are fully grown. Goal: Survive 5 waves");
+		}else if(getLevel()==8){
+			this.setDialog("Game",
+					"Last Level! Goal: Reach 5.000 Score");
+		}else if(getLevel()==9){
+			this.setDialog("Game",
+					"You reached the end of the game! Thank you for playing");
 		}
 	}
 	
 	public void initValuesIL(){
 		if(getLevel()==0){
 			this.getWorld().getPlayer().setEnergy(5);
-		}
-		if(getLevel()==1){
+		}else if(getLevel()==1){
 			this.getWorld().getPlayer().setEnergy(5);
-		}
-		if(getLevel()==2){
+		}else if(getLevel()==2){
 			this.getWorld().getPlayer().setEnergy(5);
+		}else if(getLevel()==3){
+			this.getWorld().getPlayer().setEnergy(3);
+		}else if(getLevel()==4){
+			this.getWorld().getPlayer().setEnergy(20);
+		}else if(getLevel()==5){
+			this.getWorld().getPlayer().setEnergy(25);
+		}else if(getLevel()==6){
+			this.getWorld().getPlayer().setEnergy(16);
+		}else if(getLevel()==7){
+			this.getWorld().getPlayer().setEnergy(10);
+		}else if(getLevel()==8){
+			this.getWorld().getPlayer().setEnergy(20);
+		}else if(getLevel()==9){
+			this.getWorld().getPlayer().setEnergy(0);
 		}
+	}
+	
+	public String getInfoTextIL(){
+		if(getLevel()==0)
+			return "Upgrade the plant! Reach 200 Score";
+		else if(getLevel()==1)
+			return "Sun: 2 Shoes. Defead a wave";
+		else if(getLevel()==2){
+			if((Render2D.sunSpins+1)>2)
+				return "Sun: 4 Shoes. Reach 300 Score";
+			else
+				return "Sun: 2 Shoes. Reach 300 Score";
+		}else if(getLevel()==3){
+			if((Render2D.sunSpins+1)>2 && ((Render2D.sunSpins+1)/2)%2==0)
+				return "Sun: 4 Shoes. Reach 2000 Score";
+			else
+				return "Sun: 2 Shoes. Reach 2000 Score";
+		}else if(getLevel()==4){
+			if(Render2D.sunSpins < 2)
+				return "Sun: 2 Shoes. Survive 4 more waves";
+			else if(Render2D.sunSpins < 4)
+				return "Sun: 4 Shoes. Survive 3 more waves";
+			else if(Render2D.sunSpins < 6)
+				return "Night: 1 Shear. Survive 2 more waves";
+			else if(Render2D.sunSpins < 8)
+				return "Night: 2 Shoes. Survive 1 more waves";
+		}else if(getLevel()==5){
+			if(Render2D.sunSpins < 2)
+				return "Sun: 2 Shoes. Survive 4 more waves";
+			else if(Render2D.sunSpins < 4)
+				return "Sun: 4 Shoes. Survive 3 more waves";
+			else if(Render2D.sunSpins < 6)
+				return "Sun: 1 Destroyer. Survive 2 more waves";
+			else if(Render2D.sunSpins < 8)
+				return "Sun: 2 Shoes. Survive 1 more waves";
+		}else if(getLevel()==6){
+			if(Render2D.sunSpins < 2)
+				return "Sun: 2 Shoes. Survive 5 more waves";
+			else if(Render2D.sunSpins < 4)
+				return "Sun: 2 Destroyer. Survive 4 more waves";
+			else if(Render2D.sunSpins < 6)
+				return "Sun: 2 Shoes. Survive 3 more waves";
+			else if(Render2D.sunSpins < 8)
+				return "Sun: 2 Shears. Survive 2 more waves";
+			else
+				return "Sun: 2 Shoes. Survive 1 more waves";
+		}else if(getLevel()==7){
+			if(Render2D.sunSpins < 2)
+				return "Sun: 2 Shoes. Survive 5 more waves";
+			else if(Render2D.sunSpins < 4)
+				return "Survive 4 more waves";
+			else if(Render2D.sunSpins < 6)
+				return "Sun: 2 Shear. Survive 3 more waves";
+			else if(Render2D.sunSpins < 8)
+				return "Sun: 4 Destroyer. Survive 2 more waves";
+			else
+				return "Sun: 2 Shoes. Survive 1 more waves";
+		}else if(getLevel()==8){
+			if(Render2D.sunSpins < 2)
+				return "Sun: 2 Shoes. Reach 5.000 Score";
+			else if(Render2D.sunSpins < 4)
+				return "Sun: 2 Shears. Reach 5.000 Score";
+			else if(Render2D.sunSpins < 6)
+				return "Sun: 2 Shoes. Reach 5.000 Score";
+			else
+				return "Sun: 2 Destroyer. Reach 5.000 Score";
+		}else if(getLevel()==9){
+			
+		}
+		return "";
 	}
 
 	public float getSunSpeedIL() {
 		if(getLevel()==0)
 			return 100f;
-		if(getLevel()==1)
+		else if(getLevel()==1)
 			return 500f;
-		if(getLevel()==2)
+		else if(getLevel()==2)
 			return 400f;
+		else if(getLevel()==3)
+			return 400f;
+		else if(getLevel()==4)
+			return 600f;
+		else if(getLevel()==5)
+			return 600f;
+		else if(getLevel()==6)
+			return 600f;
+		else if(getLevel()==7)
+			return 600f;
+		else if(getLevel()==8)
+			return 1000f;
+		else if(getLevel()==9)
+			return 1000f;
 		
 		return 1000f;
 	}
@@ -334,40 +508,72 @@ public class StartClass extends MainClass {
 				return true;
 			else
 				return false;
-		}
-		if(getLevel()==1){
+		}else if(getLevel()==1){
 			if(Render2D.sunSpins >= 2)
 				return true;
 			else
 				return false;
-		}
-		if(getLevel()==2){
+		}else if(getLevel()==2){
 			if(getScore()>=300)
 				return true;
 			else
 				return false;
-		}
+		}else if(getLevel()==3){
+			if(getScore()>=2000)
+				return true;
+			else
+				return false;
+		}else if(getLevel()==4){
+			if(Render2D.sunSpins >= 8)
+				return true;
+			else
+				return false;
+		}else if(getLevel()==5){
+			if(Render2D.sunSpins >= 8)
+				return true;
+			else
+				return false;
+		}else if(getLevel()==6){
+			if(Render2D.sunSpins >= 10)
+				return true;
+			else
+				return false;
+		}else if(getLevel()==7){
+			if(Render2D.sunSpins >= 10)
+				return true;
+			else
+				return false;
+		}else if(getLevel()==8){
+			if(getScore()>=5000)
+				return true;
+			else
+				return false;
+		}else if(getLevel()==9)
+			return false;
 		return false;
 	}
 	
-	private int countFlowers() {
-		int count=0;
-		for(int i=0;i<this.getWorld().getEntityArray().length;i++)	{
-			if(getWorld().getEntityArray()[i]==null  || !(getWorld().getEntityArray()[i] instanceof EntityBuilding))continue;
-			EntityBuilding bu = (EntityBuilding)getWorld().getEntityArray()[i];
-			if(bu.getBuild()!=0 && bu.getType()!=1)count++;
-		}
-		return count;
-	}
 	public boolean isGameOverIL() {
 		if(getLevel()==0)return false;
-		if(getLevel()==1){
+		else if(getLevel()==1){
 			return countFlowers()<=0;
-		}
-		if(getLevel()==2){
+		}else if(getLevel()==2){
 			return countFlowers()<=0;
+		}else if(getLevel()==3){
+			return countFlowers()<=0;
+		}else if(getLevel()==4){
+			return countFlowers()<=0;
+		}else if(getLevel()==5){
+			return countFlowers()<=0;
+		}else if(getLevel()==6){
+			return countFlowers()<=0;
+		}else if(getLevel()==7){
+			return countFlowers()<=0;
+		}else if(getLevel()==8){
+			return countFlowers()<=0;
+		}else if(getLevel()==9){
+			return false;
 		}
-		
 		return false;
 	}
 
@@ -377,14 +583,14 @@ public class StartClass extends MainClass {
 		if(getLevel()==0){
 			world.addEntity(new EntityBuilding(this,10,7.25f + random.nextFloat()/2,0,0));
 		}
-		if(getLevel()==1){
+		else if(getLevel()==1){
 			world.addEntity(new EntityBuilding(this,10f,7.25f + random.nextFloat()/2,1,0));
 			EntityBuilding flower = new EntityBuilding(this,world.getSizeX()/2,7.25f + random.nextFloat()/2,0,2);
 			flower.setKind(3);
 			world.addEntity(flower);
 			world.addEntity(new EntityBuilding(this,world.getSizeX()-10f,7.25f + random.nextFloat()/2,1,0));
 		}
-		if(getLevel()==2){
+		else if(getLevel()==2){
 			world.addEntity(new EntityBuilding(this,10f,7.25f + random.nextFloat()/2,1,0));
 			EntityBuilding flower = new EntityBuilding(this,world.getSizeX()/2,7.25f + random.nextFloat()/2,0,2);
 			flower.setKind(1);
@@ -397,40 +603,353 @@ public class StartClass extends MainClass {
 			world.addEntity(flower);
 			world.addEntity(new EntityBuilding(this,world.getSizeX()-10f,7.25f + random.nextFloat()/2,1,0));
 		}
+		else if(getLevel()==3){
+			world.addEntity(new EntityBuilding(this,10f,7.25f + random.nextFloat()/2,1,0));
+			EntityBuilding flower = new EntityBuilding(this,world.getSizeX()/2,7.25f + random.nextFloat()/2,0,2);
+			flower.setKind(3);
+			world.addEntity(flower);
+			
+			world.addEntity(new EntityBuilding(this,world.getSizeX()/2 + 2.5f,7.25f + random.nextFloat()/2,0,2));
+			
+			world.addEntity(new EntityBuilding(this,world.getSizeX()/2 + 5f,7.25f + random.nextFloat()/2,2,1));
+			world.addEntity(new EntityBuilding(this,world.getSizeX()/2 - 5f,7.25f + random.nextFloat()/2,2,0));
+			world.addEntity(new EntityBuilding(this,world.getSizeX()/2 + 7.5f,7.25f + random.nextFloat()/2,2,0));
+			world.addEntity(new EntityBuilding(this,world.getSizeX()/2 - 7.5f,7.25f + random.nextFloat()/2,2,1));
+			
+			world.addEntity(new EntityBuilding(this,world.getSizeX()-10f,7.25f + random.nextFloat()/2,1,0));
+		}
+		else if(getLevel()==4){
+			world.addEntity(new EntityBuilding(this,10f,7.25f + random.nextFloat()/2,1,0));
+			world.addEntity(new EntityBuilding(this,15f,7.25f + random.nextFloat()/2,1,0));
+			EntityBuilding flower = new EntityBuilding(this,world.getSizeX()/2,7.25f + random.nextFloat()/2,0,2);
+			flower.setKind(3);
+			world.addEntity(flower);
+			
+			world.addEntity(new EntityBuilding(this,world.getSizeX()/2 + 5f,7.25f + random.nextFloat()/2,1,0));
+			world.addEntity(new EntityBuilding(this,world.getSizeX()/2 - 5f,7.25f + random.nextFloat()/2,1,0));
+			world.addEntity(new EntityBuilding(this,world.getSizeX()/2 + 7.5f,7.25f + random.nextFloat()/2,1,0));
+			world.addEntity(new EntityBuilding(this,world.getSizeX()/2 - 7.5f,7.25f + random.nextFloat()/2,1,0));
+			
+			world.addEntity(new EntityBuilding(this,world.getSizeX()-10f,7.25f + random.nextFloat()/2,1,0));
+			world.addEntity(new EntityBuilding(this,world.getSizeX()-15f,7.25f + random.nextFloat()/2,1,0));
+		}else if(getLevel()==5){
+			world.addEntity(new EntityBuilding(this,15f,7.25f + random.nextFloat()/2,1,0));
+			EntityBuilding flower = new EntityBuilding(this,world.getSizeX()/2,7.25f + random.nextFloat()/2,0,2);
+			flower.setKind(3);
+			world.addEntity(flower);
+			
+			world.addEntity(new EntityBuilding(this,world.getSizeX()/2 + 2.5f,7.25f + random.nextFloat()/2,0,0));
+			world.addEntity(new EntityBuilding(this,world.getSizeX()/2 - 2.5f,7.25f + random.nextFloat()/2,0,0));
+			world.addEntity(new EntityBuilding(this,world.getSizeX()/2 + 5f,7.25f + random.nextFloat()/2,1,0));
+			world.addEntity(new EntityBuilding(this,world.getSizeX()/2 - 5f,7.25f + random.nextFloat()/2,1,0));
+			
+			world.addEntity(new EntityBuilding(this,world.getSizeX()-15f,7.25f + random.nextFloat()/2,1,0));
+		}else if(getLevel()==6){
+			world.addEntity(new EntityBuilding(this,15f,7.25f + random.nextFloat()/2,1,0));
+			EntityBuilding flower = new EntityBuilding(this,world.getSizeX()/2,7.25f + random.nextFloat()/2,0,2);
+			flower.setKind(3);
+			world.addEntity(flower);
+			flower = new EntityBuilding(this,world.getSizeX()/2 - 2.5f,7.25f + random.nextFloat()/2,0,2);
+			flower.setKind(1);
+			world.addEntity(flower);
+			flower = new EntityBuilding(this,world.getSizeX()/2 + 2.5f,7.25f + random.nextFloat()/2,0,2);
+			flower.setKind(1);
+			world.addEntity(flower);
+			
+			
+			world.addEntity(new EntityBuilding(this,world.getSizeX()/2 + 7.5f,7.25f + random.nextFloat()/2,0,0));
+			world.addEntity(new EntityBuilding(this,world.getSizeX()/2 - 7.5f,7.25f + random.nextFloat()/2,0,0));
+			
+	
+			world.addEntity(new EntityBuilding(this,world.getSizeX()/2 + 5f,7.25f + random.nextFloat()/2,3,0));
+			world.addEntity(new EntityBuilding(this,world.getSizeX()/2 - 5f,7.25f + random.nextFloat()/2,3,0));
+			
+			world.addEntity(new EntityBuilding(this,world.getSizeX()-15f,7.25f + random.nextFloat()/2,1,0));
+		}else if(getLevel()==7){
+			world.addEntity(new EntityBuilding(this,10f,7.25f + random.nextFloat()/2,4,0));
+			world.addEntity(new EntityBuilding(this,15f,7.25f + random.nextFloat()/2,1,0));
+			
+			EntityBuilding flower = new EntityBuilding(this,world.getSizeX()/2,7.25f + random.nextFloat()/2,0,2);
+			flower.setKind(3);
+			world.addEntity(flower);
+			
+			
+			world.addEntity(new EntityBuilding(this,world.getSizeX()/2 + 2.5f,7.25f + random.nextFloat()/2,3,0));
+			world.addEntity(new EntityBuilding(this,world.getSizeX()/2 - 2.5f,7.25f + random.nextFloat()/2,3,0));
+			
+			
+			world.addEntity(new EntityBuilding(this,world.getSizeX()/2 + 7.5f,7.25f + random.nextFloat()/2,1,0));
+			world.addEntity(new EntityBuilding(this,world.getSizeX()/2 - 7.5f,7.25f + random.nextFloat()/2,1,0));
+			
+	
+			world.addEntity(new EntityBuilding(this,world.getSizeX()/2 + 5f,7.25f + random.nextFloat()/2,3,0));
+			world.addEntity(new EntityBuilding(this,world.getSizeX()/2 - 5f,7.25f + random.nextFloat()/2,3,0));
+			
+			world.addEntity(new EntityBuilding(this,world.getSizeX()-15f,7.25f + random.nextFloat()/2,1,0));
+			world.addEntity(new EntityBuilding(this,world.getSizeX()-10f,7.25f + random.nextFloat()/2,4,0));
+		}else if(getLevel()==8){
+			world.addEntity(new EntityBuilding(this,7.5f,7.25f + random.nextFloat()/2,4,0));
+			world.addEntity(new EntityBuilding(this,10f,7.25f + random.nextFloat()/2,4,0));
+//			world.addEntity(new EntityBuilding(this,15f,7.25f + random.nextFloat()/2,1,0));
+			EntityBuilding flower = new EntityBuilding(this,world.getSizeX()/2,7.25f + random.nextFloat()/2,0,2);
+			flower.setKind(3);
+			world.addEntity(flower);
+			
+
+			world.addEntity(new EntityBuilding(this,world.getSizeX()/2 + 2.5f,7.25f + random.nextFloat()/2,3,0));
+			world.addEntity(new EntityBuilding(this,world.getSizeX()/2 - 2.5f,7.25f + random.nextFloat()/2,3,0));
+			
+			
+			world.addEntity(new EntityBuilding(this,world.getSizeX()/2 + 10,7.25f + random.nextFloat()/2,2,0));
+			world.addEntity(new EntityBuilding(this,world.getSizeX()/2 - 10,7.25f + random.nextFloat()/2,2,0));
+			
+			world.addEntity(new EntityBuilding(this,world.getSizeX()/2 + 15,7.25f + random.nextFloat()/2,0,0));
+			world.addEntity(new EntityBuilding(this,world.getSizeX()/2 - 15,7.25f + random.nextFloat()/2,0,0));
+			
+			world.addEntity(new EntityBuilding(this,world.getSizeX()/2 + 17.5f,7.25f + random.nextFloat()/2,2,0));
+			world.addEntity(new EntityBuilding(this,world.getSizeX()/2 -17.5f,7.25f + random.nextFloat()/2,2,0));
+			
+			world.addEntity(new EntityBuilding(this,world.getSizeX()/2 + 20f,7.25f + random.nextFloat()/2,3,0));
+			world.addEntity(new EntityBuilding(this,world.getSizeX()/2 - 20f,7.25f + random.nextFloat()/2,3,0));
+			
+			
+			world.addEntity(new EntityBuilding(this,world.getSizeX()/2 + 25f,7.25f + random.nextFloat()/2,1,0));
+			world.addEntity(new EntityBuilding(this,world.getSizeX()/2 -25f,7.25f + random.nextFloat()/2,1,0));
+			
+			
+			
+			world.addEntity(new EntityBuilding(this,world.getSizeX()/2 + 7.5f,7.25f + random.nextFloat()/2,1,0));
+			world.addEntity(new EntityBuilding(this,world.getSizeX()/2 - 7.5f,7.25f + random.nextFloat()/2,1,0));
+			
+	
+			world.addEntity(new EntityBuilding(this,world.getSizeX()/2 + 5f,7.25f + random.nextFloat()/2,3,0));
+			world.addEntity(new EntityBuilding(this,world.getSizeX()/2 - 5f,7.25f + random.nextFloat()/2,3,0));
+			
+//			world.addEntity(new EntityBuilding(this,world.getSizeX()-15f,7.25f + random.nextFloat()/2,1,0));
+			world.addEntity(new EntityBuilding(this,world.getSizeX()-10f,7.25f + random.nextFloat()/2,4,0));
+			world.addEntity(new EntityBuilding(this,world.getSizeX()-7.5f,7.25f + random.nextFloat()/2,4,0));
+		}else if(getLevel()==9){
+			EntityBuilding flower = new EntityBuilding(this,world.getSizeX()/2,7.25f + random.nextFloat()/2,0,2);
+			flower.setKind(3);
+			world.addEntity(flower);
+			flower = new EntityBuilding(this,world.getSizeX()/2 + 2.5f,7.25f + random.nextFloat()/2,2,2);
+			flower.setKind(3);
+			world.addEntity(flower);
+			flower = new EntityBuilding(this,world.getSizeX()/2 - 2.5f,7.25f + random.nextFloat()/2,3,2);
+			flower.setKind(3);
+			world.addEntity(flower);
+			flower = new EntityBuilding(this,world.getSizeX()/2 + 5,7.25f + random.nextFloat()/2,0,2);
+			flower.setKind(3);
+			world.addEntity(flower);
+			flower = new EntityBuilding(this,world.getSizeX()/2 - 4.5f,7.25f + random.nextFloat()/2,4,2);
+			flower.setKind(3);
+			world.addEntity(flower);
+			flower = new EntityBuilding(this,world.getSizeX()/2 + 7.3f,7.25f + random.nextFloat()/2,2,2);
+			flower.setKind(3);
+			world.addEntity(flower);
+			flower = new EntityBuilding(this,world.getSizeX()/2 - 6.7f,7.25f + random.nextFloat()/2,3,2);
+			flower.setKind(3);
+			world.addEntity(flower);
+			flower = new EntityBuilding(this,world.getSizeX()/2 + 9f,7.25f + random.nextFloat()/2,0,2);
+			flower.setKind(3);
+			world.addEntity(flower);
+			flower = new EntityBuilding(this,world.getSizeX()/2 - 8.2f,7.25f + random.nextFloat()/2,3,2);
+			flower.setKind(3);
+			world.addEntity(flower);
+			flower = new EntityBuilding(this,world.getSizeX()/2 + 13.6f,7.25f + random.nextFloat()/2,3,2);
+			flower.setKind(3);
+			world.addEntity(flower);
+			flower = new EntityBuilding(this,world.getSizeX()/2 - 14.2f,7.25f + random.nextFloat()/2,0,2);
+			flower.setKind(3);
+			world.addEntity(flower);
+			flower = new EntityBuilding(this,world.getSizeX()/2 + 17.3f,7.25f + random.nextFloat()/2,2,2);
+			flower.setKind(3);
+			world.addEntity(flower);
+			flower = new EntityBuilding(this,world.getSizeX()/2 - 18f,7.25f + random.nextFloat()/2,0,2);
+			flower.setKind(3);
+			world.addEntity(flower);
+			flower = new EntityBuilding(this,world.getSizeX()/2 + 20.5f,7.25f + random.nextFloat()/2,4,2);
+			flower.setKind(3);
+			world.addEntity(flower);
+			flower = new EntityBuilding(this,world.getSizeX()/2 - 23.3f,7.25f + random.nextFloat()/2,2,2);
+			flower.setKind(3);
+			world.addEntity(flower);
+		}
 	}
 	
 	public void tickEventIL(){
+		Random random = new Random();
+		if(Render2D.sunSpins==-1)return;
 		if(getLevel()==0){}
-		if(getLevel()==1){
+		else if(getLevel()==1){
 			if(Render2D.dayStatus()==-1 && mapVariable==0)
 				mapVariable=1;
 			if(Render2D.dayStatus()==1 && mapVariable==1){
-				getWorld().addEntity(new EntityCrow(this,true));
-				getWorld().addEntity(new EntityCrow(this,false));
+				getWorld().addEntity(new EntityShoe(this,true));
+				getWorld().addEntity(new EntityShoe(this,false));
 				mapVariable=2;
 			}
 		}
-		if(getLevel()==2){
+		else if(getLevel()==2){
 			if(Render2D.dayStatus()==0 && mapVariable<=0){
 				mapVariable=1;
 				if(Render2D.sunSpins>2)
 					 mapVariable=2;		
 			}
 			if(Render2D.dayStatus()==1 && mapVariable>0){
-				getWorld().addEntity(new EntityCrow(this,true));
-				getWorld().addEntity(new EntityCrow(this,false));
+				getWorld().addEntity(new EntityShoe(this,true));
+				getWorld().addEntity(new EntityShoe(this,false));
 				mapVariable--;
+			}
+		}
+		if(getLevel()==3){
+			if(Render2D.dayStatus()==0 && mapVariable==0){
+				mapVariable=1;
+				if(Render2D.sunSpins>2 && ((Render2D.sunSpins+1)/2)%2==0)
+					 mapVariable=2;		
+			}
+			if(Render2D.dayStatus()==1 && mapVariable>0){
+				getWorld().addEntity(new EntityShoe(this,true));
+				getWorld().addEntity(new EntityShoe(this,false));
+				mapVariable--;
+			}
+		}
+		else if(getLevel()==4){
+			if(Render2D.dayStatus()==1 && mapVariable==0 && Render2D.sunSpins < 2){
+				getWorld().addEntity(new EntityShoe(this,true));
+				getWorld().addEntity(new EntityShoe(this,false));
+				mapVariable++;
+			}
+			else if(Render2D.dayStatus()==1 && mapVariable>0 && mapVariable<=2 && Render2D.sunSpins < 4 && Render2D.sunSpins >= 2){
+				getWorld().addEntity(new EntityShoe(this,true));
+				getWorld().addEntity(new EntityShoe(this,false));
+				mapVariable++;
+			}else if(Render2D.dayStatus()==-1 && mapVariable==3 && Render2D.sunSpins < 6 && Render2D.sunSpins >= 4){
+				getWorld().addEntity(new EntityShear(this,random.nextBoolean()));
+				mapVariable++;
+			}else if(Render2D.dayStatus()==-1 && mapVariable==4 && Render2D.sunSpins < 8 && Render2D.sunSpins >= 6){
+				getWorld().addEntity(new EntityShoe(this,true));
+				getWorld().addEntity(new EntityShoe(this,false));
+				mapVariable++;
+			}
+		}
+		else if(getLevel()==5){
+			if(Render2D.dayStatus()==1 && mapVariable==0 && Render2D.sunSpins < 2){
+				getWorld().addEntity(new EntityShoe(this,true));
+				getWorld().addEntity(new EntityShoe(this,false));
+				mapVariable++;
+			}
+			else if(Render2D.dayStatus()==1 && mapVariable>0 && mapVariable<=2 && Render2D.sunSpins < 4 && Render2D.sunSpins >= 2){
+				getWorld().addEntity(new EntityShoe(this,true));
+				getWorld().addEntity(new EntityShoe(this,false));
+				mapVariable++;
+			}else if(Render2D.dayStatus()==1 && mapVariable==3 && Render2D.sunSpins < 6 && Render2D.sunSpins >= 4){
+				getWorld().addEntity(new EntityDestroyer(this,random.nextBoolean()));
+				mapVariable++;
+			}else if(Render2D.dayStatus()==1 && mapVariable==4 && Render2D.sunSpins < 8 && Render2D.sunSpins >= 6){
+				getWorld().addEntity(new EntityShoe(this,true));
+				getWorld().addEntity(new EntityShoe(this,false));
+				mapVariable++;
+			}
+		} else if(getLevel()==6){
+			if(Render2D.dayStatus()==1 && mapVariable==0 && Render2D.sunSpins < 2){
+				getWorld().addEntity(new EntityShoe(this,true));
+				getWorld().addEntity(new EntityShoe(this,false));
+				mapVariable++;
+			} else if(Render2D.dayStatus()==1 && mapVariable==1 && Render2D.sunSpins < 4 && Render2D.sunSpins >= 2){
+				getWorld().addEntity(new EntityDestroyer(this,true));
+				getWorld().addEntity(new EntityDestroyer(this,false));
+
+				mapVariable++;
+			} else if(Render2D.dayStatus()==1 && mapVariable==2 && Render2D.sunSpins < 6 && Render2D.sunSpins >= 4){
+				getWorld().addEntity(new EntityShoe(this,true));
+				getWorld().addEntity(new EntityShoe(this,false));
+				mapVariable++;
+			}else if(Render2D.dayStatus()==1 && mapVariable==3 && Render2D.sunSpins < 8 && Render2D.sunSpins >= 6){
+				getWorld().addEntity(new EntityShear(this,true));
+				getWorld().addEntity(new EntityShear(this,false));
+				mapVariable++;
+			}else if(mapVariable > 3){
+				if(Render2D.dayStatus()==-1 && mapVariable==4)
+					mapVariable=6;
+				if(Render2D.dayStatus()==1 && mapVariable>4){
+					getWorld().addEntity(new EntityShoe(this,true));
+					getWorld().addEntity(new EntityShoe(this,false));
+					mapVariable--;
+				}
+			}
+		}else if(getLevel()==7){
+			if(Render2D.dayStatus()==1 && mapVariable==0 && Render2D.sunSpins < 2){
+				getWorld().addEntity(new EntityShoe(this,true));
+				getWorld().addEntity(new EntityShoe(this,false));
+				mapVariable++;
+			}
+			else if(Render2D.dayStatus()==1 && mapVariable==1 && Render2D.sunSpins < 4 && Render2D.sunSpins >= 2){
+				
+				mapVariable++;
+			}else if(Render2D.dayStatus()==1 && mapVariable==2 && Render2D.sunSpins < 6 && Render2D.sunSpins >= 4){
+				getWorld().addEntity(new EntityShear(this,true));
+				getWorld().addEntity(new EntityShear(this,false));
+				mapVariable++;
+			}else if(Render2D.dayStatus()==1 && mapVariable>2 && mapVariable<=4 && Render2D.sunSpins < 8 && Render2D.sunSpins >= 6){
+				getWorld().addEntity(new EntityDestroyer(this,true));
+				getWorld().addEntity(new EntityDestroyer(this,false));
+				mapVariable++;
+			}else if(mapVariable > 4){
+				if(Render2D.dayStatus()==-1 && mapVariable==5)
+					mapVariable=7;
+				if(Render2D.dayStatus()==1 && mapVariable>5){
+					getWorld().addEntity(new EntityShoe(this,true));
+					getWorld().addEntity(new EntityShoe(this,false));
+					mapVariable--;
+				}
+			}
+		}else if(getLevel()==8){
+			if(Render2D.dayStatus()==1 && mapVariable==0 && Render2D.sunSpins < 2){
+				getWorld().addEntity(new EntityShoe(this,true));
+				getWorld().addEntity(new EntityShoe(this,false));
+				mapVariable++;
+			}
+			else if(Render2D.dayStatus()==1 && mapVariable==1 && Render2D.sunSpins < 4 && Render2D.sunSpins >= 2){
+				getWorld().addEntity(new EntityShear(this,true));
+				getWorld().addEntity(new EntityShear(this,false));
+				mapVariable++;
+			}else if(Render2D.dayStatus()==1 && mapVariable==2 && Render2D.sunSpins < 6 && Render2D.sunSpins >= 4){
+				getWorld().addEntity(new EntityShoe(this,true));
+				getWorld().addEntity(new EntityShoe(this,false));
+				mapVariable++;
+			}else if(Render2D.dayStatus()==1 && mapVariable==3 &&  Render2D.sunSpins < 8 && Render2D.sunSpins >= 6){
+				getWorld().addEntity(new EntityDestroyer(this,true));
+				getWorld().addEntity(new EntityDestroyer(this,false));
+				mapVariable++;
+			}else if(mapVariable > 3){
+				if(Render2D.dayStatus()==-1 && mapVariable==4)
+					mapVariable=5;
+				if(Render2D.dayStatus()==1 && mapVariable==5){
+					getWorld().addEntity(new EntityDestroyer(this,true));
+					getWorld().addEntity(new EntityDestroyer(this,false));
+					mapVariable=4;
+				}
 			}
 		}
 	}
 	@Override
 	public void SoundInit() {
 
-//	getSoundPlayer().addToBuffer("bg",mainFolder+"music.wav", true,0.1f);
-//	getSoundPlayer().addToBuffer("bg_long",System.getProperty("user.dir") + StartScreen.urlSplitter+"util"+ StartScreen.urlSplitter+"track_1.wav", true,0.2f);
-//	getSoundPlayer().addToBuffer("exp0",System.getProperty("user.dir") + StartScreen.urlSplitter+"util"+ StartScreen.urlSplitter+"exp_0.wav", false,1f);
-//	getSoundPlayer().addToBuffer("exp1",System.getProperty("user.dir") + StartScreen.urlSplitter+"util"+ StartScreen.urlSplitter+"exp_1.wav", false,1f);
-//	getSoundPlayer().addToBuffer("hit0",System.getProperty("user.dir") + StartScreen.urlSplitter+"util"+ StartScreen.urlSplitter+"hit_0.wav", false,1f);
+	getSoundPlayer().addToBuffer("bg",mainFolder+"music.wav", true,0.1f);
+	//Sounds: "coindrop","coinpickup","enemydeath","walldeath","wallattack","win","gameover","upgrade","plantdeath", "bomb"
+	
+//	getSoundPlayer().addToBuffer("bg_long",mainFolder+"track_1.wav", true,0.2f);
+	getSoundPlayer().addToBuffer("coindrop",mainFolder+"coindrop.wav", false,0.3f);//
+	getSoundPlayer().addToBuffer("coinpickup",mainFolder+"coinpickup.wav", false,0.3f);//
+	getSoundPlayer().addToBuffer("enemydeath",mainFolder+"enemydeath.wav", false,0.3f);//
+	getSoundPlayer().addToBuffer("walldeath",mainFolder+"walldeath.wav", false,0.3f);//
+	getSoundPlayer().addToBuffer("wallattack",mainFolder+"wallattack.wav", false,0.3f);//
+	getSoundPlayer().addToBuffer("win",mainFolder+"win.wav", false,0.3f);//
+	getSoundPlayer().addToBuffer("gameover",mainFolder+"gameover.wav", false,0.3f);
+	getSoundPlayer().addToBuffer("upgrade",mainFolder+"upgrade.wav", false,0.3f);//
+	getSoundPlayer().addToBuffer("plantdeath",mainFolder+"plantdeath.wav", false,0.3f);//
+	getSoundPlayer().addToBuffer("bomb",mainFolder+"bomb.wav", false,0.3f);//
 	}
 
 
